@@ -1,0 +1,6 @@
+*.pyc
+*.o
+*.od
+*.log
+libky.so
+a.out
