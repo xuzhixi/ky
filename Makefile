@@ -167,7 +167,7 @@ ky_log.od: ./ky_log.c\
 	$(CC_DEBUG) ky_log.od ./ky_log.c
 	
 install:
-	echo "install function not set"
+	echo 'install command not set'
 	
 clean:
 	rm -f libky.so libky.so

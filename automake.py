@@ -12,10 +12,13 @@ from automake_config import *
 COMMON_TYPE = 1		# common program
 DYNAMIC_TYPE = 2	# dynamic library
 STATIC_TYPE = 3		# static library
+
 g_tabKey = "\t"
 g_newLine = g_tabKey
+g_mid_ext = ".o"			# 中间文件扩展名
+g_debug_mid_ext = ".od"		# debug中间文件扩展名
 
-includeReg = ur'''^\s*#include\s*<(ky_.+?\.h)>\s*$'''		# 获取所包含头文件的正则表达式
+includeReg = ur'''^\s*#include\s*<(ky.+?\.h)>\s*$'''		# 获取所包含头文件的正则表达式
 sourceItemList = None
 headerItemList = None
 
@@ -129,8 +132,8 @@ def print_objects(sourceItemList) :
 	objFileListStr = ""
 	objDebugFileListStr = ""
 	for name in sourceItemList :
-		objFileListStr += ( g_tabKey + name + ".o\\\n" )
-		objDebugFileListStr += ( g_tabKey + name + ".od\\\n")
+		objFileListStr += ( g_tabKey + name + g_mid_ext + "\\\n" )
+		objDebugFileListStr += ( g_tabKey + name + g_debug_mid_ext + "\\\n")
 	print "OBJECTS=\\"
 	print objFileListStr + g_tabKey
 	print "OBJECTS_DEBUG=\\"
@@ -148,11 +151,11 @@ def print_project_file(sourceItemList):
 	else :
 		printTab( "$(CPP_LINKER) %s $(OBJECTS) $(LIBS)", g_bin_name )
 	for name in sourceItemList :
-		print "%s.o: %s%s" % ( name, sourceItemList[name], get_depandent_str(sourceItemList[name], ".h") )
+		print "%s%s: %s%s" % ( name, g_mid_ext, sourceItemList[name], get_depandent_str(sourceItemList[name], ".h") )
 		if os.path.splitext( sourceItemList[name] )[1] == ".c" :
-			printTab( "$(CC) %s.o %s", name, sourceItemList[name] )
+			printTab( "$(CC) %s%s %s", name, g_mid_ext, sourceItemList[name] )
 		else :
-			printTab( "$(CPP) %s.o %s", name, sourceItemList[name] )
+			printTab( "$(CPP) %s%s %s", name, g_mid_ext, sourceItemList[name] )
 	print g_newLine
 
 	print "debug: $(OBJECTS_DEBUG)"
@@ -161,20 +164,21 @@ def print_project_file(sourceItemList):
 	else :
 		printTab( "$(CPP_LINKER_DEBUG) %s $(OBJECTS_DEBUG) $(LIBS)", g_debug_bin_name )
 	for name in sourceItemList :
-		print "%s.od: %s%s" % ( name, sourceItemList[name], get_depandent_str(sourceItemList[name], ".h") )
+		print "%s%s: %s%s" % ( name, g_debug_mid_ext, sourceItemList[name], get_depandent_str(sourceItemList[name], ".h") )
 		if os.path.splitext( sourceItemList[name] )[1] == ".c" :
-			printTab( "$(CC_DEBUG) %s.od %s", name, sourceItemList[name] )	
+			printTab( "$(CC_DEBUG) %s%s %s", name, g_debug_mid_ext, sourceItemList[name] )	
 		else :
-			printTab( "$(CPP_DEBUG) %s.od %s", name, sourceItemList[name] )	
+			printTab( "$(CPP_DEBUG) %s%s %s", name, g_debug_mid_ext, sourceItemList[name] )	
 	print g_newLine
 	
 	print "install:"
-	printTab( "echo \"install function not set\"" )
+	for command in g_install_commands :
+		printTab( command )
 	print g_newLine
 
 	print "clean:"
 	printTab( "rm -f %s %s", g_bin_name, g_debug_bin_name )
-	printTab( "rm -rf *.o *.od" )
+	printTab( "rm -rf *%s *%s", g_mid_ext, g_debug_mid_ext )
 
 def printTab(format, *args) :
 	print g_tabKey,

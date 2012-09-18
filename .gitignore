@@ -2,5 +2,5 @@
 *.o
 *.od
 *.log
+*.out
 libky.so
-a.out
