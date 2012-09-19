@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <string.h>
 #include <sys/epoll.h>
 
@@ -31,7 +30,7 @@ ky_reactor_t *ky_reactor_new(int size, uint32 model)
 	ky_reactor_t *rat;
 
 	rat = ky_malloc( sizeof(ky_reactor_t) );
-	rat->register_skfd_tree = ky_avltree_new(sizeof(int), sizeof(ky_skfd_t), ky_cmp_int);
+	rat->register_skfd_tree = ky_map_new(sizeof(int), sizeof(ky_skfd_t), ky_cmp_int);
 	rat->delay_del_list = ky_linklist_new(sizeof(ky_reactor_delay_del_t), NULL);
 	rat->epfd = epoll_create(size);     // 建立一个epoll,最多可以监听size个fd 
 	rat->reactor_model = model;
@@ -41,7 +40,7 @@ ky_reactor_t *ky_reactor_new(int size, uint32 model)
 
 void ky_reactor_release(ky_reactor_t *rat)
 {
-	ky_avltree_release( rat->register_skfd_tree );
+	ky_map_release( rat->register_skfd_tree );
 	ky_linklist_release( rat->delay_del_list );
 	ky_free( rat );
 }
@@ -57,7 +56,7 @@ void ky_reactor_add(ky_reactor_t *rat, ky_socket_t *sk, uint32 eventType, ky_rea
 	event.param = ky_malloc( paramLen );
 	memcpy( event.param, param, paramLen );    // 设置回调函数的参数
 
-	skfdNode = ky_avltree_find( rat->register_skfd_tree, &(sk->fd) );
+	skfdNode = ky_map_find( rat->register_skfd_tree, &(sk->fd) );
 	if ( skfdNode == NULL )
 	{
 		ky_skfd_t skfd;
@@ -69,7 +68,7 @@ void ky_reactor_add(ky_reactor_t *rat, ky_socket_t *sk, uint32 eventType, ky_rea
 		skfd.register_event_list = ky_linklist_new( sizeof(ky_event_t), ky_cmp_event_t );
 		ky_linklist_add( skfd.register_event_list, &event );
 
-		ky_avltree_add(rat->register_skfd_tree, &(sk->fd), &skfd);
+		ky_map_add(rat->register_skfd_tree, &(sk->fd), &skfd);
 		epoll_ctl(rat->epfd, EPOLL_CTL_ADD, sk->fd, &(skfd.evt));     //注册epoll事件
 	}
 	else
@@ -80,13 +79,13 @@ void ky_reactor_add(ky_reactor_t *rat, ky_socket_t *sk, uint32 eventType, ky_rea
 	}
 }
 
-void ky_reactor_mod(ky_reactor_t *rat, ky_socket_t *sk, uint32 eventType, ky_reactor_callback_t callback, void *param, uint32 paramLen)
+void ky_reactor_mod(ky_reactor_t *rat, ky_socket_t *sk, uint32 eventType, ky_reactor_callback_t callback, void *param, size_t paramLen)
 {
 	ky_skfd_t *skfd;
 	ky_event_t event;
 	ky_event_t *eventNode;
 
-	skfd = ky_avltree_find( rat->register_skfd_tree, &(sk->fd) );
+	skfd = ky_map_find( rat->register_skfd_tree, &(sk->fd) );
 	if ( skfd == NULL )
 	{
 		ky_reactor_add( rat, sk, eventType, callback, param, paramLen );
@@ -115,7 +114,7 @@ void ky_reactor_del(ky_reactor_t *rat, ky_socket_t *sk, uint32 eventType)
 	ky_event_t event;
 	ky_event_t *eventNode;
 
-	skfd = ky_avltree_find( rat->register_skfd_tree, &(sk->fd) );
+	skfd = ky_map_find( rat->register_skfd_tree, &(sk->fd) );
 	if ( skfd != NULL )
 	{
 		event.event_type = eventType;
@@ -126,7 +125,7 @@ void ky_reactor_del(ky_reactor_t *rat, ky_socket_t *sk, uint32 eventType)
 		if ( ky_linklist_is_null(skfd->register_event_list) )
 		{
 			ky_linklist_release( skfd->register_event_list );
-			ky_avltree_del( rat->register_skfd_tree, &(sk->fd) );
+			ky_map_del( rat->register_skfd_tree, &(sk->fd) );
 			epoll_ctl(rat->epfd, EPOLL_CTL_DEL, sk->fd, NULL);  // 删除 sk 的所有epoll事件
 		}   
 		else
@@ -141,11 +140,11 @@ void ky_reactor_del_sock(ky_reactor_t *rat, ky_socket_t *sk)
 {
 	ky_skfd_t *skfd;
 
-	skfd = ky_avltree_find( rat->register_skfd_tree, &(sk->fd) );
+	skfd = ky_map_find( rat->register_skfd_tree, &(sk->fd) );
 	if ( skfd != NULL )
 	{
 		ky_linklist_release( skfd->register_event_list );
-		ky_avltree_del( rat->register_skfd_tree, &(sk->fd) );
+		ky_map_del( rat->register_skfd_tree, &(sk->fd) );
 		epoll_ctl(rat->epfd, EPOLL_CTL_DEL, sk->fd, NULL);  // 删除 sk 的所有epoll事件
 	}   
 }
@@ -182,11 +181,10 @@ void ky_reactor_event_loop(ky_reactor_t *rat)
 	{
 		// 等待有事件发生
 		eventCount = epoll_wait(rat->epfd, rat->events, KY_REACTOR_EVERY_HANDLE_COUNT, -1);
-		printf("-----------------------------------------------eventCount: %d\n", eventCount);
 		for (i=0; i<eventCount; i++)
 		{
 			// handle event
-			skfd = ky_avltree_find( rat->register_skfd_tree, &(rat->events[i].data.fd) );
+			skfd = ky_map_find( rat->register_skfd_tree, &(rat->events[i].data.fd) );
 			iter = ky_linklist_iter( skfd->register_event_list );
 			while ( iter != NULL )
 			{

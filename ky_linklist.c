@@ -81,14 +81,14 @@ void *ky_linklist_find(ky_linklist_t *linklist, void *value)
 	{
 		if ( linklist->cmp_fun(p->value, value) == 0 )
 		{
-			return p;
+			return p->value;
 		}
 		p = p->next;
 	}
 
 	return NULL;
 }
-	
+
 void ky_linklist_add(ky_linklist_t *linklist, void *value)
 {
 	ky_linklist_s *node;
@@ -149,13 +149,13 @@ void ky_linklist_insert(ky_linklist_t *linklist, void *value, void *insertValue)
 
 void ky_linklist_mod(ky_linklist_t *linklist, void *value)
 {
-	ky_linklist_s *p;
+	ky_linklist_s *oldValue;
 
-	p = ky_linklist_find( linklist, value );
-	if ( p != NULL )
+	oldValue = ky_linklist_find( linklist, value );
+	if ( oldValue != NULL )
 	{
 		// 找到则修改
-		memcpy( p->value, value, linklist->value_len );
+		memcpy( oldValue, value, linklist->value_len );
 	}
 	else
 	{

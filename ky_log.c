@@ -4,7 +4,7 @@
 #include <ky_log.h>
 #include <ky_time.h>
 
-ky_log_level_t g_ky_log_std_level;
+ky_log_level_t g_ky_log_std_level = KY_LOG_LEVEL_ALL;
 
 sint8 ky_log_open(ky_log_t *log, const char *logFile, const char *openModel, ky_log_level_t level)
 {
@@ -80,6 +80,23 @@ void ky_log_msg(ky_log_t *log, ky_log_level_t level, const char* fileName, int l
 	fprintf(log->fd, "%s %s#filename:%s line:%d# %s\n", ky_date_time(dateTime), levelStr, fileName, lineNum, msg);
 }
 
+sint8 ky_log_redirect_std(const char *fileName, const char *openModel)
+{
+	// 重定向 stdout, stderr
+	if (freopen(fileName, openModel, stdout) == NULL)
+	{
+		fprintf(stderr, "Cann't redirect stream to log file for a!\n");
+		return KY_ERROR;
+	}
+	if (freopen(fileName, openModel, stderr) == NULL)
+	{
+		fprintf(stderr, "Cann't redirect stream to log file for a!\n");
+		return KY_ERROR;
+	}
+
+	return KY_OK;
+}
+
 void ky_log_std_init(ky_log_level_t level)
 {
 	g_ky_log_std_level = level;
@@ -123,22 +140,5 @@ void ky_log_std_msg(FILE *fd, ky_log_level_t level, const char* fileName, int li
 	va_end(ap);
 
 	fprintf(fd, "%s %s#filename:%s line:%d# %s\n", ky_date_time(dateTime), levelStr, fileName, lineNum, msg);
-}
-
-sint8 ky_log_redirect_std(const char *fileName, const char *openModel)
-{
-	// 重定向 stdout, stderr
-	if (freopen(fileName, openModel, stdout) == NULL)
-	{
-		fprintf(stderr, "Cann't redirect stream to log file for a!\n");
-		return KY_ERROR;
-	}
-	if (freopen(fileName, openModel, stderr) == NULL)
-	{
-		fprintf(stderr, "Cann't redirect stream to log file for a!\n");
-		return KY_ERROR;
-	}
-
-	return KY_OK;
 }
 

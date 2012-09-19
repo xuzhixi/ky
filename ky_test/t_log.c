@@ -5,15 +5,13 @@
 int main()
 {
 	//ky_log_t log;
-	//ky_log_open(&log, "ky.log", "a", KY_LOG_INFO);
 	//ky_log_redirect_std("ky.log", "a");
+	//ky_log_open(&log, "ky.log", "w+", KY_LOG_LEVEL_INFO);
 
 	//fprintf(stderr, "start------------------start\n");
-	//fflush(stderr);
 	//KY_LOG_ERROR(&log, "testId: %d", 100);
 	//KY_LOG_WARN(&log, "testId: %d", 100);
 	//fprintf(stderr, "mid----------------------mid\n");
-	//fflush(stderr);
 	//KY_LOG_INFO(&log, "testId: %d", 100);
 	//fprintf(stderr, "end----------------------end\n");
 

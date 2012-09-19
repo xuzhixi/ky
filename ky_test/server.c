@@ -105,7 +105,7 @@ int main()
 
 	printf("bind socketId: %d\n", server.fd);
 
-	KY_PROGRESS_POOL(10, {
+	//KY_PROGRESS_POOL(10, {
 		rat = ky_reactor_new(1000, KY_REACTOR_ET);
 		
 		ky_reactor_add(rat, &server, EPOLLIN, handle_connect, &server, sizeof(ky_socket_t));
@@ -115,7 +115,7 @@ int main()
 		ky_reactor_release( rat );
 
 		return 0;
-	})
+	//})
 
 
 	// 关闭服务器

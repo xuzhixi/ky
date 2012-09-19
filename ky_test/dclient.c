@@ -19,12 +19,12 @@ int main(int argc, char *argv[])
 	}
 
 	//发送信息
-	ky_address_init(&addr, "192.168.136.129", 5566);
+	ky_address_init(&addr, "192.168.203.160", 5566);
 	strcpy(buf, "Hello!");
-	ky_sock_sendto(&client, buf, strlen(buf), &addr, 0);
+	ky_sock_sendto(&client, buf, strlen(buf), &addr);
 
 	//读取信息
-	recvLen = ky_sock_recvfrom(&client, buf, sizeof(buf), &addr, 0);
+	recvLen = ky_sock_recvfrom(&client, buf, sizeof(buf), &addr);
 	buf[ recvLen ] = '\0';
 	ky_address_get_ip(&addr, ip, sizeof(ip));
 	printf("Peer Address %s:%d\n", ip, ky_address_get_port(&addr));

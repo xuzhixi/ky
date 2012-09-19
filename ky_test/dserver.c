@@ -21,7 +21,7 @@ int main()
 	while(1)
 	{  
 		// 接收消息
-		recvLen = ky_sock_recvfrom(&server, buf, sizeof(buf), &addr, 0);
+		recvLen = ky_sock_recvfrom(&server, buf, sizeof(buf), &addr);
 		buf[ recvLen ] = '\0';
 		ky_address_get_ip(&addr, ip, sizeof(ip)); 
 		printf("Peer ky_address_t %s:%d\n", ip, ky_address_get_port(&addr));
@@ -29,7 +29,7 @@ int main()
 
 		strcpy(buf, "Hello World!");
 		// 发送消息
-		ky_sock_sendto(&server, buf, strlen(buf), &addr, 0);
+		ky_sock_sendto(&server, buf, strlen(buf), &addr);
 	}
 	//关闭服务器
 	ky_sock_close(&server);

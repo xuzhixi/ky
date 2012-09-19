@@ -37,6 +37,7 @@ sint8 ky_sock_init(ky_socket_t *sk, const char *ip, uint16 port, sint16 type, si
 	if ( port == KY_PORT_ANY )
 	{
 		addrLen = sizeof(sk->addr);
+		// 如果端口为ANY，则获取系统所分配的端口
 		getsockname(sk->fd, (struct sockaddr *)&(sk->addr), &addrLen);
 	}
 
@@ -104,6 +105,19 @@ ssize_t ky_sock_recv(ky_socket_t *sk, char *buf, size_t buflen)
 	return recv(sk->fd, buf, buflen, 0);
 }
 
+ssize_t ky_sock_sendto(ky_socket_t *sk, const void *buf, size_t sendlen, ky_address_t *address)
+{
+	return sendto(sk->fd, buf, sendlen, 0, (struct sockaddr *)&(address->addr), sizeof(address->addr));
+}
+
+ssize_t ky_sock_recvfrom(ky_socket_t *sk, void *buf, size_t buflen, ky_address_t *address)
+{
+	socklen_t addrLen;
+
+	addrLen = sizeof(address->addr);
+	return recvfrom(sk->fd, buf, buflen, 0, (struct sockaddr *)&(address->addr), &addrLen);
+}
+
 const char *ky_sock_get_ip(ky_socket_t *sk, char *dst, socklen_t dstLen)
 {
 	return inet_ntop(AF_INET, &(sk->addr.sin_addr), dst, dstLen);
@@ -123,18 +137,4 @@ uint16 ky_address_get_port(ky_address_t *address)
 {
 	return ntohs(address->addr.sin_port);
 }
-
-ssize_t ky_sock_recvfrom(ky_socket_t *sk, void *buf, size_t buflen, ky_address_t *address, int flags)
-{
-	socklen_t addrLen;
-
-	addrLen = sizeof(address->addr);
-	return recvfrom(sk->fd, buf, buflen, flags, (struct sockaddr *)&(address->addr), &addrLen);
-}
-
-ssize_t ky_sock_sendto(ky_socket_t *sk, const void *buf, size_t sendlen, ky_address_t *address, int flags)
-{
-	return sendto(sk->fd, buf, sendlen, flags, (struct sockaddr *)&(address->addr), sizeof(address->addr));
-}
-
 

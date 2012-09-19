@@ -13,19 +13,19 @@
 #define KY_ABORT      -6
 
 #ifndef _CPLUSPLUS
-typedef char bool;
+typedef char bool;						///< 布尔型，值为 KY_TRUE 表示真，值为 KY_FALSE 表示假
 #endif
 
-typedef char schar;
-typedef char sint8;
-typedef short int  sint16;
-typedef int sint32;
-typedef long long sint64;
+typedef char schar;						///< 带符号 字符型
+typedef char sint8;						///< 带符号 8位整形
+typedef short int  sint16;				///< 带符号 16位整形
+typedef int sint32;						///< 带符号 32位整形
+typedef long long sint64;				///< 带符号 64位整形
 
-typedef unsigned char uchar;
-typedef unsigned char uint8;
-typedef unsigned short int uint16;
-typedef unsigned int uint32;
-typedef unsigned long long uint64;
+typedef unsigned char uchar;			///< 无符号 字符型
+typedef unsigned char uint8;			///< 无符号 8位整形
+typedef unsigned short int uint16;		///< 无符号 16位整形
+typedef unsigned int uint32;			///< 无符号 32位整形
+typedef unsigned long long uint64;		///< 无符号 64位整形
 
 #endif // _KY_TYPE_H
