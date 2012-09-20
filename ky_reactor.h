@@ -1,6 +1,8 @@
 #ifndef _KY_REACTOR_H
 #define _KY_REACTOR_H
 
+#include <sys/epoll.h>
+
 #include <ky_types.h>
 #include <ky_linklist.h>
 #include <ky_map.h>
