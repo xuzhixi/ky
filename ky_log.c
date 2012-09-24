@@ -77,7 +77,7 @@ void ky_log_msg(ky_log_t *log, ky_log_level_t level, const char* fileName, int l
 	vsprintf(msg, format, ap); 
 	va_end(ap);
 
-	fprintf(log->fd, "%s %s#filename:%s line:%d# %s\n", ky_date_time(dateTime), levelStr, fileName, lineNum, msg);
+	fprintf(log->fd, "%s %s#filename:%s line:%d# %s\n", ky_now(dateTime, 20, "yyyy-MM-dd_hh:mm"), levelStr, fileName, lineNum, msg);
 }
 
 sint8 ky_log_redirect_std(const char *fileName, const char *openModel)
@@ -139,6 +139,6 @@ void ky_log_std_msg(FILE *fd, ky_log_level_t level, const char* fileName, int li
 	vsprintf(msg, format, ap);
 	va_end(ap);
 
-	fprintf(fd, "%s %s#filename:%s line:%d# %s\n", ky_date_time(dateTime), levelStr, fileName, lineNum, msg);
+	fprintf(fd, "%s %s#filename:%s line:%d# %s\n", ky_now(dateTime, 20, "yyyy-MM-dd_hh:mm"), levelStr, fileName, lineNum, msg);
 }
 
