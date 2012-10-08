@@ -7,13 +7,16 @@
 #include <pthread.h>
 #endif
 
+#define KY_LOG_FILENAME_MAXSIZE 150
+#define KY_LOG_MSG_MAXSIZE 256
+
 #define ky_log_debug(log, format, ...) ky_log_msg(log, KY_LOG_LEVEL_DEBUG, __FILE__, __LINE__, format, ##__VA_ARGS__) 
 #define ky_log_info(log, format, ...)  ky_log_msg(log, KY_LOG_LEVEL_INFO,  __FILE__, __LINE__, format, ##__VA_ARGS__)
 #define ky_log_warn(log, format, ...)  ky_log_msg(log, KY_LOG_LEVEL_WARN,  __FILE__, __LINE__, format, ##__VA_ARGS__)
 #define ky_log_error(log, format, ...) ky_log_msg(log, KY_LOG_LEVEL_ERROR, __FILE__, __LINE__, format, ##__VA_ARGS__)
 #define ky_log_fatal(log, format, ...) ky_log_msg(log, KY_LOG_LEVEL_FATAL, __FILE__, __LINE__, format, ##__VA_ARGS__)
 
-#define ky_log_open_default(logFile, openMode, level, splitSize) g_ky_log_default=ky_log_open(logFile, openMode, level,splitSize)
+#define ky_log_open_default(logFile, openMode, level, splitType, splitSize) g_ky_log_default=ky_log_open(logFile, openMode, level, splitType, splitSize)
 #define KY_LOG_DEBUG(format, ...) ky_log_msg(g_ky_log_default, KY_LOG_LEVEL_DEBUG, __FILE__, __LINE__, format, ##__VA_ARGS__)
 #define KY_LOG_INFO(format, ...)  ky_log_msg(g_ky_log_default, KY_LOG_LEVEL_INFO,  __FILE__, __LINE__, format, ##__VA_ARGS__)
 #define KY_LOG_WARN(format, ...)  ky_log_msg(g_ky_log_default, KY_LOG_LEVEL_WARN,  __FILE__, __LINE__, format, ##__VA_ARGS__)
@@ -43,7 +46,9 @@ typedef struct ky_log_t
 {
 	FILE *fd;	
 	char *file_name;
-	long  split_size;			///< 超过这个大小会切割日志；0为不切割日志
+	int   split_type;			///< 切割日志的方式: 0 表示不切割; 1 表示按日期切割; 2 表示按大小切割
+	int   day;					///< 记录今天是这个月的多少号
+	long  split_size;			///< 超过这个大小(字节)会切割日志
 #ifdef __linux
 	pthread_mutex_t mutex;		///< 日志线程锁
 #endif
@@ -59,11 +64,12 @@ extern ky_log_t *g_ky_log_default;
  * @param  logFile		日志文件路径(也可以为: stdout、stderr)
  * @param  openModel	如果logFile是一个文件路径，则这个参数指明打开文件的模式; 否则忽略这个参数
  * @param  level		日志的等级
- * @param  splitSize	超过这个大小(单位:字节)将分割日志, 0表示不切割日志
+ * @param  splitType	切割日志的方式: 0 表示不切割; 1 表示按日期切割; 2 表示按大小切割
+ * @param  splitSize	超过这个大小(单位:字节)将分割日志
  * @retval 非NULL		表示打开日志成功
  * @retval NULL			表示打开日志失败
  */
-extern ky_log_t *ky_log_open(const char *logFile, const char *openMode, ky_log_level_t level, long splitSize);
+extern ky_log_t *ky_log_open(const char *logFile, const char *openMode, ky_log_level_t level, int splitType, long splitSize);
 /**
  * @brief 关闭一个日志
  */

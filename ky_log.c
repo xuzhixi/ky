@@ -9,11 +9,18 @@
 
 ky_log_t *g_ky_log_default;
 
-static void ky_log_split_name(char *dst, const char *logFileName)
+static void ky_log_split_name(char *dst, const char *logFileName, int splitType)
 {
 	char dateTime[20];
 
-	sprintf(dst, "%s_%s", logFileName, ky_now(dateTime, 20, "yyyy-MM-dd_hh-mm-ss"));
+	if ( splitType == 1 )
+	{
+		sprintf(dst, "%s_%s", logFileName, ky_now(dateTime, 20, "yyyy-MM-dd"));
+	}
+	else if ( splitType == 2 )
+	{
+		sprintf(dst, "%s_%s", logFileName, ky_now(dateTime, 20, "yyyy-MM-dd_hh-mm-ss"));
+	}
 }
 
 static FILE *ky_log_open_file(const char *fileName, const char *openMode)
@@ -29,8 +36,9 @@ static FILE *ky_log_open_file(const char *fileName, const char *openMode)
 	return fd;
 }
 
-ky_log_t *ky_log_open(const char *logFile, const char *openMode, ky_log_level_t level, long splitSize)
+ky_log_t *ky_log_open(const char *logFile, const char *openMode, ky_log_level_t level, int splitType, long splitSize)
 {
+	ky_time_t t;
 	ky_log_t *log;
 	FILE *out;
 
@@ -44,11 +52,12 @@ ky_log_t *ky_log_open(const char *logFile, const char *openMode, ky_log_level_t 
 	}
 	else
 	{
-		char splitFileName[150];
+		char splitFileName[KY_LOG_FILENAME_MAXSIZE];
 
-		if (splitSize != 0)
+		if (splitType != 0)
 		{
-			ky_log_split_name(splitFileName, logFile);	
+			ky_localtime( &t );
+			ky_log_split_name(splitFileName, logFile, splitType);	
 			out = ky_log_open_file(splitFileName, openMode);
 		}
 		else
@@ -67,6 +76,8 @@ ky_log_t *ky_log_open(const char *logFile, const char *openMode, ky_log_level_t 
 	strcpy(log->file_name, logFile);
 	log->fd = out;
 	log->level = level;
+	log->split_type = splitType;
+	log->day		= t.day;
 	log->split_size = splitSize;
 #ifdef __linux
 	pthread_mutex_init( &(log->mutex), NULL );
@@ -90,9 +101,10 @@ void ky_log_close(ky_log_t *log)
 
 void ky_log_msg(ky_log_t *log, ky_log_level_t level, const char* fileName, int lineNum, const char *format, ...)
 {
-	char msg[256];
+	char msg[KY_LOG_MSG_MAXSIZE];
 	char dateTime[20];
 	char levelStr[10];
+	ky_time_t t;
 	struct stat fileInfo;
 	va_list ap;  
 
@@ -100,20 +112,37 @@ void ky_log_msg(ky_log_t *log, ky_log_level_t level, const char* fileName, int l
 	pthread_mutex_lock( &(log->mutex) );
 #endif
 	// 分割日志
-	if ( log->split_size != 0 && strcmp(log->file_name, "stdout") !=0 && strcmp(log->file_name, "stderr") != 0 )
+	if ( log->split_type != 0 && strcmp(log->file_name, "stdout") !=0 && strcmp(log->file_name, "stderr") != 0 )
 	{
-		fstat(fileno(log->fd), &fileInfo);
-		if ( fileInfo.st_size > log->split_size  )
-		{
-			char splitFileName[150];
-			FILE *out;
+		char splitFileName[KY_LOG_FILENAME_MAXSIZE];
+		FILE *out;
 
-			ky_log_split_name(splitFileName, log->file_name);
-			out = ky_log_open_file(splitFileName, "a");
-			if ( out != NULL )
+		if ( log->split_type == 1 )
+		{
+			ky_localtime( &t );			
+			if ( log->day != t.day )
 			{
-				fclose( log->fd );
-				log->fd = out;
+				ky_log_split_name(splitFileName, log->file_name, log->split_type);
+				out = ky_log_open_file(splitFileName, "a");
+				if ( out != NULL )
+				{
+					fclose( log->fd );
+					log->fd = out;
+				}
+			}
+		}
+		else if ( log->split_type == 2 )
+		{
+			fstat(fileno(log->fd), &fileInfo);
+			if ( fileInfo.st_size > log->split_size  )
+			{
+				ky_log_split_name(splitFileName, log->file_name, log->split_type);
+				out = ky_log_open_file(splitFileName, "a");
+				if ( out != NULL )
+				{
+					fclose( log->fd );
+					log->fd = out;
+				}
 			}
 		}
 	}

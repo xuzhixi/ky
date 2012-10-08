@@ -29,9 +29,10 @@ int main()
 	//fprintf(stderr, "end----------------------end\n");
 
 	int i;
-	//g_ky_log_default = ky_log_open("ky.log", "w", KY_LOG_LEVEL_ALL, 5 * 1024 * 1024);
-	g_ky_log_default = ky_log_open("stdout", "w", KY_LOG_LEVEL_ALL, 0);
-	for (i=0; i<10; i++)
+	g_ky_log_default = ky_log_open("stdout", "w", KY_LOG_LEVEL_ALL, 0, 0);
+	//g_ky_log_default = ky_log_open("ky.log", "w", KY_LOG_LEVEL_ALL, 1, 0);
+	//g_ky_log_default = ky_log_open("ky.log", "w", KY_LOG_LEVEL_ALL, 2, 5 * 1024 * 1024);
+	for (i=0; i<100000; i++)
 	{
 		KY_LOG_ERROR("testId: %d", 100);
 		KY_LOG_WARN("testId: %d", 100);

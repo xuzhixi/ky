@@ -32,7 +32,7 @@ int ky_save_pid_file(const char *fileName)
 		KY_LOG_WARN("open pidfile: %s error!", fileName);
 		return -1;
 	}
-	fprintf(fp, "%d",  getpid());
+	fprintf(fp, "%d\n",  getpid());
 
 	return 0;
 }

@@ -8,14 +8,13 @@ int main()
 	ky_mysql_t *my;
 	char sql[256];
 
-	ky_log_open_default("stdout", "a", KY_LOG_LEVEL_ALL, 0);
+	ky_log_open_default("stdout", "a", KY_LOG_LEVEL_ALL, 0, 0);
 	ky_save_pid_file("t_mysql_pid");
 	g_ky_mysql_is_debug = 1;
 	my = ky_mysql_new(5);
 	if ( ky_mysql_connect( my, "192.168.136.1", "root", "2185530", "test", 3306 ) )
 	{
 		printf("auto id: %lu\n", ky_mysql_execute_id(my, "insert into user(name,age) values('888', 888)"));
-		printf("testtest\n");
 		printf("affected rows: %lu\n", ky_mysql_affected_rows(my));
 		if ( ky_mysql_select( my , "select id,name,age from user" ) )
 		{
