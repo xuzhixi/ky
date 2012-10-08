@@ -43,8 +43,8 @@ typedef struct ky_address_t
  * @param  port		绑定的端口
  * @param  type		socket的类型; SOCK_STREAM表示TCP，SOCK_DGRAM表示UDP
  * @param  block	是否是阻塞的socket; KY_BLOCK表示阻塞，KY_NOBLOCK表示非阻塞
- * @retval 0	表示成功
- * @retval -1 表示失败
+ * @retval 0		表示成功
+ * @retval -1		表示失败
  */
 extern int ky_sock_init(ky_socket_t *sk, const char *ip, unsigned int port, int type, int block);
 /**
@@ -52,8 +52,8 @@ extern int ky_sock_init(ky_socket_t *sk, const char *ip, unsigned int port, int 
  * 
  * @param  sk			要监听的socket
  * @param  maxWaitCount	允许的最大等待队列(即未accept的socket连接)
- * @retval 0		表示成功
- * @retval -1		表示失败
+ * @retval 0			表示成功
+ * @retval -1			表示失败
  */
 extern int ky_sock_listen(ky_socket_t *sk, int maxWaitCount);
 /**
@@ -62,16 +62,16 @@ extern int ky_sock_listen(ky_socket_t *sk, int maxWaitCount);
  * @param  clientSk		保存接受的socket
  * @param  block		设置接受的socket阻塞类型; KY_BLOCK表示阻塞，KY_NOBLOCK表示非阻塞
  * @param  serverSk		从serverSk接受一个socket连接
- * @retval 0		表示成功
- * @retval -1		表示失败
+ * @retval 0			表示成功
+ * @retval -1			表示失败
  */
 extern int ky_sock_accept(ky_socket_t *clientSk, int block, ky_socket_t *serverSk);
 /**
  * @brief 关闭一个socket
  *
  * @param  sk			要关闭的socket
- * @retval 0		表示成功
- * @retval -1		表示失败
+ * @retval 0			表示成功
+ * @retval -1			表示失败
  */
 extern int ky_sock_close(ky_socket_t *sk);
 /**

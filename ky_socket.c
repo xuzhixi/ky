@@ -72,6 +72,8 @@ int ky_sock_accept(ky_socket_t *clientSk, int block, ky_socket_t *serverSk)
 		// 设置为非阻塞
 		fcntl(clientSk->fd, F_SETFL, fcntl(clientSk->fd, F_GETFL) | O_NONBLOCK);
 	}
+	//setsockopt(clifd,SOL_SOCKET,SO_RCVBUF,(const char*)&nRecvBuf,sizeof(int));//设置clifd socket状态,SOL_SOCKET存取socket层, 设置接收缓冲区的大小
+	//setsockopt(clifd,SOL_SOCKET,SO_SNDBUF,(const char*)&nSendBuf,sizeof(int));//SORCVBUF设置接收的暂存区大小，SO_SNDBUF设置送出的暂存区大小
 
 	return 0;
 }
