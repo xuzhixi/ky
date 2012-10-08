@@ -21,7 +21,7 @@ void handle_msg(ky_reactor_t *rat, void *param)
 	{
 		//读取信息
 		recvLen = ky_sock_recvfrom(client, buf, sizeof(buf), &addr);
-		if ( recvLen != KY_ERROR )
+		if ( recvLen != -1 )
 		{
 			buf[ recvLen ] = '\0';
 			ky_address_get_ip(&addr, ip, sizeof(ip));

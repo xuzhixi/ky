@@ -1,9 +1,7 @@
 #ifndef _KY_LINKLIST_H
 #define _KY_LINKLIST_H
 
-#include <ky_types.h>
-
-#ifdef _CPLUSPLUS
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -15,7 +13,7 @@ typedef struct ky_linklist_s
 }ky_linklist_s, ky_linklist_iter_t;
 
 typedef size_t ky_linklist_value_len_t;
-typedef sint8 (*ky_linklist_comparefun_t)(void *, void *);
+typedef int (*ky_linklist_comparefun_t)(void *, void *);
 
 typedef struct ky_linklist_t
 {
@@ -47,10 +45,10 @@ extern void ky_linklist_release(ky_linklist_t *linklist);
 /**
  * @brief 判断链表是否为空 
  *
- * @retval  KY_TRUE		为空
- * @retval	KY_FALSE	不为空
+ * @retval  1	为空
+ * @retval	0	不为空
  */
-extern bool ky_linklist_is_null(ky_linklist_t *linklist);
+extern int ky_linklist_is_null(ky_linklist_t *linklist);
 /**
  * @brief 查找链表中,是否有某个值
  *
@@ -64,6 +62,7 @@ extern void *ky_linklist_find(ky_linklist_t *linklist, void *value);
  * 链表保存的值，是value所指内容的一个copy
  */
 extern void ky_linklist_add(ky_linklist_t *linklist, void *value);
+extern void ky_linklist_addv(ky_linklist_t *linklist, void *value, ky_linklist_value_len_t valueLen);
 /**
  * @brief 在链表中插入一个值
  *
@@ -74,6 +73,7 @@ extern void ky_linklist_add(ky_linklist_t *linklist, void *value);
  * @param  insertValue  插入的位置
  */
 extern void ky_linklist_insert(ky_linklist_t *linklist, void *value, void *insertValue);
+extern void ky_linklist_insertv(ky_linklist_t *linklist, void *value, void *insertValue, ky_linklist_value_len_t valueLen);
 /**
  * @brief 修改链表的值
  *
@@ -81,6 +81,7 @@ extern void ky_linklist_insert(ky_linklist_t *linklist, void *value, void *inser
  * 如果链表中中不存在这个value, 则把这个value添加到链表的末尾
  */
 extern void ky_linklist_mod(ky_linklist_t *linklist, void *value);
+extern void ky_linklist_modv(ky_linklist_t *linklist, void *value, ky_linklist_value_len_t valueLen);
 /**
  * @brief 删除链表中的某个值
  */
@@ -99,7 +100,8 @@ extern ky_linklist_iter_t *ky_linklist_iter_next(ky_linklist_iter_t *iter);
  */
 extern void *ky_linklist_iter_value(ky_linklist_iter_t *iter);
 
-#ifdef _CPLUSPLUS
+
+#ifdef __cplusplus
 }
 #endif
 

@@ -4,12 +4,12 @@
 #define ky_max(val1, val2) ((val1) > (val2) ? (val1) : (val2))
 #define ky_min(val1, val2) ((val1) < (val2) ? (val1) : (val2))
 
-#ifdef _CPLUSPLUS
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 
-#ifdef _CPLUSPLUS
+#ifdef __cplusplus
 }	
 #endif
 

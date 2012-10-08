@@ -1,25 +1,26 @@
 #include <string.h>
+#include <stdlib.h>
+#include "ky_math.h"
+#include "ky_rbtree.h"
 
-#include <ky_math.h>
-#include <ky_malloc.h>
-#include <ky_rbtree.h>
-
-ky_rbnode_s ky_rbtree_nil_node = { NULL, NULL, NULL, KY_RBTREE_BLACK, NULL, NULL };
+ky_rbnode_s ky_rbtree_nil_node = { NULL, NULL, NULL, KY_RBTREE_BLACK, NULL, NULL, 0, 0 };
 ky_rbnode_s *ky_rbtree_nil = &ky_rbtree_nil_node;
 
 static ky_rbnode_s *ky_rbtree_node_new_i(void *key, ky_rbtree_key_len_t keyLen, void *value, ky_rbtree_value_len_t valueLen)
 {
 	ky_rbnode_s *node;
 
-	node = (ky_rbnode_s *)ky_malloc( sizeof(ky_rbnode_s) );
+	node = (ky_rbnode_s *)malloc( sizeof(ky_rbnode_s) );
 	node->parent = ky_rbtree_nil;
 	node->left = ky_rbtree_nil;
 	node->right = ky_rbtree_nil;
 	node->color = KY_RBTREE_RED;
+	node->key_len = keyLen;
+	node->value_len = valueLen;
 
-	node->key = ky_malloc( keyLen );
+	node->key = malloc( keyLen );
 	memcpy( node->key, key, keyLen );
-	node->value = ky_malloc( valueLen );
+	node->value = malloc( valueLen );
 	memcpy( node->value, value, valueLen );
 
 	return node;
@@ -27,9 +28,9 @@ static ky_rbnode_s *ky_rbtree_node_new_i(void *key, ky_rbtree_key_len_t keyLen, 
 
 static void ky_rbtree_node_delete_i(ky_rbnode_s *node)
 {
-	ky_free( node->key );
-	ky_free( node->value );
-	ky_free( node );
+	free( node->key );
+	free( node->value );
+	free( node );
 }
 
 static void ky_rbtree_release_i(ky_rbtree_s *root)
@@ -117,7 +118,7 @@ static void ky_double_rotate_with_right_i(ky_rbtree_s *root, ky_rbtree_s **rbtre
 
 static ky_rbnode_s *ky_rbtree_find_i(ky_rbtree_s *root, void *key, ky_rbtree_comparefun_t cmpFun)
 {
-	sint8 cmpResult;
+	int cmpResult;
 
 	while ( root != ky_rbtree_nil && (cmpResult = cmpFun(root->key, key)) != 0 )
 	{
@@ -358,7 +359,7 @@ ky_rbtree_t *ky_rbtree_new(ky_rbtree_key_len_t keyLen, ky_rbtree_value_len_t val
 {
 	ky_rbtree_t *rbtree;
 
-	rbtree =  (ky_rbtree_t *)ky_malloc( sizeof(ky_rbtree_t) );
+	rbtree =  (ky_rbtree_t *)malloc( sizeof(ky_rbtree_t) );
 	rbtree->key_len = keyLen;
 	rbtree->value_len = valueLen;
 	rbtree->cmp_fun = cmpFun;
@@ -376,18 +377,18 @@ void ky_rbtree_clear(ky_rbtree_t *rbtree)
 void ky_rbtree_release(ky_rbtree_t *rbtree)
 {
 	ky_rbtree_clear( rbtree );
-	ky_free( rbtree );
+	free( rbtree );
 }
 
-bool ky_rbtree_is_null(ky_rbtree_t *rbtree)
+int ky_rbtree_is_null(ky_rbtree_t *rbtree)
 {
 	if ( rbtree->tree == ky_rbtree_nil )
 	{
-		return KY_TRUE;
+		return 1;
 	}
 	else
 	{
-		return KY_FALSE;
+		return 0;
 	}
 }
 
@@ -436,15 +437,15 @@ void *key_rbtree_find_min(ky_rbtree_t *rbtree)
 	}
 }
 
-void ky_rbtree_add(ky_rbtree_t *rbtree, void *key, void *value)
+static void ky_rbtree_add_i(ky_rbtree_t *rbtree, void *key, ky_rbtree_key_len_t keyLen, void *value, ky_rbtree_value_len_t valueLen)
 {
 	ky_rbtree_comparefun_t cmpFun = rbtree->cmp_fun;
 	ky_rbnode_s *p; 
 	ky_rbnode_s *x;
 	ky_rbnode_s *node;
-	sint8 cmpResult;
+	int cmpResult;
 
-	node = ky_rbtree_node_new_i(key, rbtree->key_len, value, rbtree->value_len);
+	node = ky_rbtree_node_new_i(key, keyLen, value, valueLen);
 	if ( rbtree->tree == ky_rbtree_nil )
 	{
 		node->color = KY_RBTREE_BLACK;
@@ -468,7 +469,8 @@ void ky_rbtree_add(ky_rbtree_t *rbtree, void *key, void *value)
 		}
 		else
 		{
-			// 如果插入的key, 已经存在, 则什么也不做
+			// 如果插入的key, 已经存在, 则删除新建的结点
+			ky_rbtree_node_delete_i( node );
 			return;
 		}
 	}
@@ -486,22 +488,43 @@ void ky_rbtree_add(ky_rbtree_t *rbtree, void *key, void *value)
 	ky_rbtree_add_rebalance_i( node, &(rbtree->tree) );
 }
 
-void ky_rbtree_mod(ky_rbtree_t *rbtree, void *key, void *value)
+void ky_rbtree_add(ky_rbtree_t *rbtree, void *key, void *value)
+{
+	ky_rbtree_add_i( rbtree, key, rbtree->key_len, value, rbtree->value_len);
+}
+
+void ky_rbtree_addv(ky_rbtree_t *rbtree, void *key, ky_rbtree_key_len_t keyLen, void *value, ky_rbtree_value_len_t valueLen)
+{
+	ky_rbtree_add_i( rbtree, key, keyLen, value, valueLen);
+}
+
+static void ky_rbtree_mod_i(ky_rbtree_t *rbtree, void *key, ky_rbtree_key_len_t keyLen, void *value, ky_rbtree_value_len_t valueLen)
 {
 	ky_rbnode_s *tNode;
 
 	tNode = ky_rbtree_find_i( rbtree->tree, key, rbtree->cmp_fun );
 	if ( tNode == ky_rbtree_nil )
 	{
-		ky_rbtree_add( rbtree, key, value );
+		ky_rbtree_add_i( rbtree, key, keyLen, value, valueLen );
 	}
 	else
 	{
-		memcpy(tNode->value, value, rbtree->value_len);
+		free( tNode->value );
+		tNode->value = malloc( valueLen );
+		memcpy(tNode->value, value, valueLen);
+		tNode->value_len = valueLen;
 	}
 }
 
+void ky_rbtree_mod(ky_rbtree_t *rbtree, void *key, void *value)
+{
+	ky_rbtree_mod_i( rbtree, key, rbtree->key_len, value, rbtree->value_len );
+}
 
+void ky_rbtree_modv(ky_rbtree_t *rbtree, void *key, ky_rbtree_key_len_t keyLen, void *value, ky_rbtree_value_len_t valueLen)
+{
+	ky_rbtree_mod_i( rbtree, key, keyLen, value, valueLen );
+}
 
 void ky_rbtree_del(ky_rbtree_t *rbtree, void *key)
 {
@@ -515,8 +538,14 @@ void ky_rbtree_del(ky_rbtree_t *rbtree, void *key)
 		if ( node->left != ky_rbtree_nil && node->right != ky_rbtree_nil )	// 被删除节点，有两个非空子节点
 		{
 			lMaxNode = ky_rbtree_find_max_i( node->left );
-			memcpy( node->key, lMaxNode->key, rbtree->key_len );
-			memcpy( node->value, lMaxNode->value, rbtree->value_len );
+			free( node->key );
+			free( node->value );
+			node->key = malloc( lMaxNode->key_len );
+			node->value = malloc( lMaxNode->value_len );
+			memcpy( node->key, lMaxNode->key, lMaxNode->key_len );
+			memcpy( node->value, lMaxNode->value, lMaxNode->value_len );
+			node->key_len = lMaxNode->key_len;
+			node->value_len = lMaxNode->value_len;
 			node = lMaxNode;
 		}
 

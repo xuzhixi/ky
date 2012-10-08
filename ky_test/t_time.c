@@ -17,7 +17,12 @@ int main()
 	//printf("now: %ld\n", date);
 	
 	char dt[20];
-	printf("now: %s\n", ky_now(dt, sizeof(dt), "yyyy-MM-dd hh:mm:ss"));
+	ky_time_t t;
+	
+	ky_localtime( &t );
+	printf("%s\n", ky_now(dt, sizeof(dt), "yyyy-MM-dd hh:mm:ss"));
+	printf("%s\n", ky_strftime(dt, sizeof(dt), "%Y-%m-%d %H:%M:%S"));
+	printf("%d-%d-%d %d:%d:%d 星期%d\n", t.year, t.month, t.day, t.hour, t.minute, t.second, t.wday);
 
 	return 0;
 }

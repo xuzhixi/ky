@@ -2,23 +2,29 @@
 #define _KY_LOG_H
 
 #include <stdio.h>
-#include <ky_types.h>
 
-#define KY_LOG_DEBUG(log, format, ...) ky_log_msg(log, KY_LOG_LEVEL_DEBUG, __FILE__, __LINE__, format, ##__VA_ARGS__) 
-#define KY_LOG_INFO(log, format, ...)  ky_log_msg(log, KY_LOG_LEVEL_INFO,  __FILE__, __LINE__, format, ##__VA_ARGS__)
-#define KY_LOG_WARN(log, format, ...)  ky_log_msg(log, KY_LOG_LEVEL_WARN,  __FILE__, __LINE__, format, ##__VA_ARGS__)
-#define KY_LOG_ERROR(log, format, ...) ky_log_msg(log, KY_LOG_LEVEL_ERROR, __FILE__, __LINE__, format, ##__VA_ARGS__)
-#define KY_LOG_FATAL(log, format, ...) ky_log_msg(log, KY_LOG_LEVEL_FATAL, __FILE__, __LINE__, format, ##__VA_ARGS__)
+#ifdef __linux
+#include <pthread.h>
+#endif
 
-#define KY_LOG_STD_DEBUG(format, ...) ky_log_std_msg(stderr, KY_LOG_LEVEL_DEBUG, __FILE__, __LINE__, format, ##__VA_ARGS__)
-#define KY_LOG_STD_INFO(format, ...)  ky_log_std_msg(stderr, KY_LOG_LEVEL_INFO,  __FILE__, __LINE__, format, ##__VA_ARGS__)
-#define KY_LOG_STD_WARN(format, ...)  ky_log_std_msg(stderr, KY_LOG_LEVEL_WARN,  __FILE__, __LINE__, format, ##__VA_ARGS__)
-#define KY_LOG_STD_ERROR(format, ...) ky_log_std_msg(stderr, KY_LOG_LEVEL_ERROR, __FILE__, __LINE__, format, ##__VA_ARGS__)
-#define KY_LOG_STD_FATAL(format, ...) ky_log_std_msg(stderr, KY_LOG_LEVEL_FATAL, __FILE__, __LINE__, format, ##__VA_ARGS__)
+#define ky_log_debug(log, format, ...) ky_log_msg(log, KY_LOG_LEVEL_DEBUG, __FILE__, __LINE__, format, ##__VA_ARGS__) 
+#define ky_log_info(log, format, ...)  ky_log_msg(log, KY_LOG_LEVEL_INFO,  __FILE__, __LINE__, format, ##__VA_ARGS__)
+#define ky_log_warn(log, format, ...)  ky_log_msg(log, KY_LOG_LEVEL_WARN,  __FILE__, __LINE__, format, ##__VA_ARGS__)
+#define ky_log_error(log, format, ...) ky_log_msg(log, KY_LOG_LEVEL_ERROR, __FILE__, __LINE__, format, ##__VA_ARGS__)
+#define ky_log_fatal(log, format, ...) ky_log_msg(log, KY_LOG_LEVEL_FATAL, __FILE__, __LINE__, format, ##__VA_ARGS__)
 
-#ifdef _CPLUSPLUS
+#define ky_log_open_default(logFile, openMode, level, splitSize) g_ky_log_default=ky_log_open(logFile, openMode, level,splitSize)
+#define KY_LOG_DEBUG(format, ...) ky_log_msg(g_ky_log_default, KY_LOG_LEVEL_DEBUG, __FILE__, __LINE__, format, ##__VA_ARGS__)
+#define KY_LOG_INFO(format, ...)  ky_log_msg(g_ky_log_default, KY_LOG_LEVEL_INFO,  __FILE__, __LINE__, format, ##__VA_ARGS__)
+#define KY_LOG_WARN(format, ...)  ky_log_msg(g_ky_log_default, KY_LOG_LEVEL_WARN,  __FILE__, __LINE__, format, ##__VA_ARGS__)
+#define KY_LOG_ERROR(format, ...) ky_log_msg(g_ky_log_default, KY_LOG_LEVEL_ERROR, __FILE__, __LINE__, format, ##__VA_ARGS__)
+#define KY_LOG_FATAL(format, ...) ky_log_msg(g_ky_log_default, KY_LOG_LEVEL_FATAL, __FILE__, __LINE__, format, ##__VA_ARGS__)
+#define ky_log_close_default()	  ky_log_close(g_ky_log_default)
+
+#ifdef __cplusplus
 extern "C" {
 #endif
+
 
 /// 日志的等级
 typedef enum ky_log_level_t
@@ -36,22 +42,28 @@ typedef enum ky_log_level_t
 typedef struct ky_log_t
 {
 	FILE *fd;	
-	uint8 level;
+	char *file_name;
+	long  split_size;			///< 超过这个大小会切割日志；0为不切割日志
+#ifdef __linux
+	pthread_mutex_t mutex;		///< 日志线程锁
+#endif
+	ky_log_level_t level;
 }ky_log_t;
 
-extern ky_log_level_t g_ky_log_std_level;
+extern ky_log_t *g_ky_log_default;
 
 /**
  * @brief 打开一个日志
  *
  * @param  log			用来操作日志的结构体
- * @param  logFile		日志文件路径(也可以为: stdin、stdout、stderror)
+ * @param  logFile		日志文件路径(也可以为: stdout、stderr)
  * @param  openModel	如果logFile是一个文件路径，则这个参数指明打开文件的模式; 否则忽略这个参数
  * @param  level		日志的等级
- * @retval KY_OK		表示打开日志成功
- * @retval KY_ERROR		表示打开日志失败
+ * @param  splitSize	超过这个大小(单位:字节)将分割日志, 0表示不切割日志
+ * @retval 非NULL		表示打开日志成功
+ * @retval NULL			表示打开日志失败
  */
-extern sint8 ky_log_open(ky_log_t *log, const char *logFile, const char *openModel, ky_log_level_t level);
+extern ky_log_t *ky_log_open(const char *logFile, const char *openMode, ky_log_level_t level, long splitSize);
 /**
  * @brief 关闭一个日志
  */
@@ -76,23 +88,13 @@ extern void ky_log_msg(ky_log_t *log, ky_log_level_t level, const char* fileName
  *
  * @param  fileName		文件的路径
  * @param  openModel	文件的打开模式
- * @retval KY_OK		表示重定向成功
- * @retval KY_ERROR		表示重定向失败
+ * @retval 0			表示重定向成功
+ * @retval -1			表示重定向失败
  */
-extern sint8 ky_log_redirect_std(const char *fileName, const char *openModel);
+extern int ky_log_redirect_std(const char *fileName, const char *openMode);
 
-/**
- * @brief 初始化stdout和stderr，输出日志的等级
- */
-extern void ky_log_std_init(ky_log_level_t level);
-/**
- * @brief 与ky_log_msg类似，不同的是: 第一个参数是stdout或者stderr
- *
- * @see ky_log_msg()
- */
-extern void ky_log_std_msg(FILE *fd, ky_log_level_t level, const char* fileName, int lineNum, const char *format, ...);
 
-#ifdef _CPLUSPLUS
+#ifdef __cplusplus
 }
 #endif
 

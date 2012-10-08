@@ -2,13 +2,15 @@
 #define _KY_AVLTREE_H
 
 #include <sys/types.h>
-#include <ky_types.h>
 
-#ifdef _CPLUSPLUS
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef ssize_t ky_avltree_height_t;
+
+typedef size_t ky_avltree_key_len_t;
+typedef size_t ky_avltree_value_len_t;
 
 /// AVL树的一个节点，内部使用的结构体
 typedef struct ky_avltree_s
@@ -18,11 +20,11 @@ typedef struct ky_avltree_s
 	ky_avltree_height_t height;	
 	void *key;
 	void  *value;
+	ky_avltree_key_len_t key_len;
+	ky_avltree_value_len_t value_len;
 }ky_avlnode_s, ky_avltree_s;
 
-typedef size_t ky_avltree_key_len_t;
-typedef size_t ky_avltree_value_len_t;
-typedef sint8 (*ky_avltree_comparefun_t)(void *, void *);
+typedef int (*ky_avltree_comparefun_t)(void *, void *);
 
 /// AVL树结构体
 typedef struct ky_avltree_t
@@ -56,16 +58,17 @@ extern void ky_avltree_release(ky_avltree_t *avltree);
 /**
  * @brief 判断AVL树是否为空 
  *
- * @retval  KY_TRUE		为空
- * @retval	KY_FALSE	不为空
+ * @retval  1	为空
+ * @retval	0	不为空
  */
-extern bool ky_avltree_is_null(ky_avltree_t *avltree);
+extern int ky_avltree_is_null(ky_avltree_t *avltree);
 /**
  * @brief 在AVL树中添加一个键值对
  *
  * AVL树保存的键值对，是key、value所指内容的一个copy
  */
 extern void ky_avltree_add(ky_avltree_t *avltree, void *key, void *value);
+extern void ky_avltree_addv(ky_avltree_t *avltree, void *key, ky_avltree_key_len_t keyLen, void *value, ky_avltree_value_len_t valueLen);
 /**
  * @brief 修改AVL树的键值对
  *
@@ -73,6 +76,7 @@ extern void ky_avltree_add(ky_avltree_t *avltree, void *key, void *value);
  * 如果AVL树中不存在这个key, 则把这个键值对插入到AVL树中
  */
 extern void ky_avltree_mod(ky_avltree_t *avltree, void *key, void *value);
+extern void ky_avltree_modv(ky_avltree_t *avltree, void *key, ky_avltree_key_len_t keyLen, void *value, ky_avltree_value_len_t valueLen);
 /**
  * @brief 删除AVL树的键值对
  */
@@ -93,7 +97,7 @@ extern void *ky_avltree_find_max(ky_avltree_t *avltree);
  */
 extern void *key_avltree_find_min(ky_avltree_t *avltree);
 
-#ifdef _CPLUSPLUS
+#ifdef __cplusplus
 }
 #endif
 

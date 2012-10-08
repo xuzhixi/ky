@@ -1,47 +1,75 @@
 #include <stdio.h>
 #include <string.h>
-#include<time.h>
+#include "ky_time.h"
 
-#include <ky_types.h>
-#include <ky_time.h>
+#ifdef __WIN32
+#include <windows.h>
+#endif
 
-static void ky_get_localtime(struct tm *p)
+
+void ky_localtime(ky_time_t *t)
 {
+#ifdef __linux
+	time_t timep;
+	struct tm p;
+
+	time(&timep);
+	localtime_r(&timep, &p);
+	t->year     = 1900+p.tm_year;
+	t->month    = 1+p.tm_mon;
+	t->day      = p.tm_mday;
+	t->hour     = p.tm_hour;
+	t->minute   = p.tm_min;
+	t->second   = p.tm_sec;
+	t->wday     = p.tm_wday;
+#endif
+#ifdef __WIN32
+	SYSTEMTIME sys;
+
+	GetLocalTime( &sys );
+	t->year		= sys.wYear;
+	t->month	= sys.wMonth;
+	t->day		= sys.wDay;
+	t->hour		= sys.wHour;
+	t->minute	= sys.wMinute;
+	t->second	= sys.wSecond;
+	t->wday		= sys.wDayOfWeek;
+	t->milli_second = sys.wMilliseconds;
+#endif
+}
+
+void ky_current_tm(struct tm *p)
+{
+#ifdef __linux
 	time_t timep;
 
 	time(&timep);
-	localtime_r(&timep, p); // 取得当地时间
+	localtime_r(&timep, p);
+#endif
+#ifdef __WIN32
+	ky_time_t t;
+
+	ky_localtime( &t );
+	p->tm_year	= t.year - 1900;
+	p->tm_mon	= t.month - 1;
+	p->tm_mday	= t.day;
+	p->tm_hour	= t.hour;
+	p->tm_min	= t.minute;
+	p->tm_sec	= t.second;
+	p->tm_wday	= t.wday;
+	p->tm_yday	= 1;
+	p->tm_isdst	= 1;
+#endif
 }
 
 char *ky_strftime(char *dst, size_t dstLen, const char *format)
 {
 	struct tm p;
 	
-	ky_get_localtime( &p );
+	ky_current_tm( &p );
 	strftime( dst, dstLen, format, &p );
 
 	return dst;
-}
-
-static bool ky_cmp_option(const char *val1, const char *val2, size_t len)
-{
-	size_t size = 0;
-
-	while ( *val1 != '\0' && *val2 != '\0' && *val1 == *val2 && size != len )
-	{
-		size++;
-		val1++;
-		val2++;
-	}
-
-	if ( size == len )
-	{
-		return KY_TRUE;
-	}
-	else
-	{
-		return KY_FALSE;
-	}
 }
 
 static void ky_timecpy(char **dst, char *time, char **opt, size_t optLen)
@@ -68,74 +96,73 @@ char *ky_now(char *dst, size_t dstLen, const char *format)
 	char minuteS[3];
 	char second[3];
 	char secondS[3];
-	struct tm p;
+	ky_time_t t;
 	char temp[50];
 	char *s, *d;
-	size_t len;
 
-	ky_get_localtime( &p );
-	sprintf(year, "%d", 1900+p.tm_year);
+	ky_localtime( &t );
+	sprintf(year,    "%d",   t.year);
 	yearS = year + 2;
-	sprintf(month, "%02d", 1+p.tm_mon);
-	sprintf(monthS, "%d", 1+p.tm_mon);
-	sprintf(day, "%02d", 1+p.tm_mday);
-	sprintf(dayS, "%d", 1+p.tm_mday);
-	sprintf(hour, "%02d", p.tm_hour);
-	sprintf(hourS, "%d", p.tm_hour);
-	sprintf(minute, "%02d", p.tm_min);
-	sprintf(minuteS, "%d", p.tm_min);
-	sprintf(second, "%02d", p.tm_sec);
-	sprintf(secondS, "%d", p.tm_sec);
+	sprintf(month,   "%02d", t.month);
+	sprintf(monthS,  "%d",   t.month);
+	sprintf(day,	 "%02d", t.day);
+	sprintf(dayS,    "%d",   t.day);
+	sprintf(hour,    "%02d", t.hour);
+	sprintf(hourS,   "%d",   t.hour);
+	sprintf(minute,  "%02d", t.minute);
+	sprintf(minuteS, "%d",   t.minute);
+	sprintf(second,  "%02d", t.second);
+	sprintf(secondS, "%d",   t.second);
 	
 	s = (char *)format;
 	d = temp;
 	while ( *s != '\0' )
 	{
-		if ( ky_cmp_option(s, "yyyy", 4) )
+		if ( memcmp(s, "yyyy", 4) == 0 )
 		{
 			ky_timecpy( &d, year, &s, 4 );
 		}
-		else if ( ky_cmp_option(s, "MM", 2) )
+		else if ( memcmp(s, "MM", 2) == 0 )
 		{
 			ky_timecpy( &d, month, &s, 2 );
 		}
-		else if ( ky_cmp_option(s, "dd", 2) )
+		else if ( memcmp(s, "dd", 2) == 0 )
 		{
 			ky_timecpy( &d, day, &s, 2 );
 		}
-		else if ( ky_cmp_option(s, "hh", 2) )
+		else if ( memcmp(s, "hh", 2) == 0 )
 		{
 			ky_timecpy( &d, hour, &s, 2 );
 		}
-		else if ( ky_cmp_option(s, "mm", 2) )
+		else if ( memcmp(s, "mm", 2) == 0 )
 		{
 			ky_timecpy( &d, minute, &s, 2 );
 		}
-		else if ( ky_cmp_option(s, "ss", 2) )
+		else if ( memcmp(s, "ss", 2) == 0 )
 		{
 			ky_timecpy( &d, second, &s, 2 );
 		}
-		else if ( ky_cmp_option(s, "yy", 2) )
+		else if ( memcmp(s, "yy", 2) == 0 )
 		{
 			ky_timecpy( &d, yearS, &s, 2 );
 		}
-		else if ( ky_cmp_option(s, "M", 1) )
+		else if ( memcmp(s, "M", 1) == 0 )
 		{
 			ky_timecpy( &d, monthS, &s, 1 );
 		}
-		else if ( ky_cmp_option(s, "d", 1) )
+		else if ( memcmp(s, "d", 1) == 0 )
 		{
 			ky_timecpy( &d, dayS, &s, 1 );
 		}
-		else if ( ky_cmp_option(s, "h", 1) )
+		else if ( memcmp(s, "h", 1) == 0 )
 		{
 			ky_timecpy( &d, hourS, &s, 1 );
 		}
-		else if ( ky_cmp_option(s, "m", 1) )
+		else if ( memcmp(s, "m", 1) == 0 )
 		{
 			ky_timecpy( &d, minuteS, &s, 1 );
 		}
-		else if ( ky_cmp_option(s, "s", 1) )
+		else if ( memcmp(s, "s", 1) == 0 )
 		{
 			ky_timecpy( &d, secondS, &s, 1 );
 		}
@@ -148,9 +175,6 @@ char *ky_now(char *dst, size_t dstLen, const char *format)
 	}
 	*d = '\0';
 
-	len = strlen( temp );
-	len = len < dstLen ? len : dstLen - 1;
-	memcpy( dst, temp, len );
-	dst[len] = '\0';
+	snprintf(dst, dstLen, temp);
 	return dst;
 }

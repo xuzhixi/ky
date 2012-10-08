@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <ky_map.h>
 #include <ky_cmp.h>
@@ -16,7 +17,7 @@ void preorder_traversal(ky_rbtree_s *root)
 	{
 		key = root->key;
 		value = root->value;
-		printf( "key: %d value: %d color: %s\n", *key, *value, color_str(root) );
+		printf( "key: %s value: %d color: %s\n", key, *value, color_str(root) );
 		preorder_traversal(root->left);
 		preorder_traversal(root->right);
 	}
@@ -92,84 +93,42 @@ int black_count(ky_rbtree_s *root)
 int main()
 {
 	ky_map_t *rbTree;
-	int isQuit = 0;
-	int key;
+	char *key;
 	int value;
-	uint8 c;
-	int i;
 
-	rbTree = ky_map_new(sizeof(int), sizeof(int), ky_cmp_int);
+	rbTree = ky_map_new(sizeof(int), sizeof(int), ky_cmp_str);
 
-	srand( time(NULL) );
-	for (i=0; i<50; i++)		// 随机插入
-	{
-		key = rand() % 100;
-		value = rand() % 1000;
-		ky_map_addv( rbTree, &key, sizeof(int), &value, sizeof(int) );
-		test_two_red( rbTree->tree );	// 每次插入都进行测试
-		black_count( rbTree->tree );
-	}
-	test_two_red( rbTree->tree );
-	printf("黑色路径长度: %d\n", black_count( rbTree->tree ) );
-	//printf("################################################\n");
-	//preorder_traversal( rbTree->tree );
-	//printf("################################################\n\n");
-
-	for (i=0; i<200; i++)		// 随机删除
-	{
-		key = rand() % 100;
-		ky_map_del( rbTree, &key );
-		test_two_red( rbTree->tree );	// 每次删除都进行测试
-		black_count( rbTree->tree );
-	}
+	key = "a";
+	value = 1;
+	ky_map_addv( rbTree, key, strlen(key)+1, &value, sizeof(int) );
+	key = "bb";
+	value = 2;
+	ky_map_addv( rbTree, key, strlen(key)+1, &value, sizeof(int) );
+	key = "ccc";
+	value = 3;
+	ky_map_addv( rbTree, key, strlen(key)+1, &value, sizeof(int) );
 	test_two_red( rbTree->tree );
 	printf("黑色路径长度: %d\n", black_count( rbTree->tree ) );
 	printf("################################################\n");
 	preorder_traversal( rbTree->tree );
 	printf("################################################\n");
 
-	/*
-	while (1)
-	{
-		printf("\n\n1. add\n2. mod\n3. del\n4. show data\n5. quit\nplease input your choise: ");
-		scanf("%d", &c);
-		switch ( c )
-		{
-			case 1:
-				printf("please input yout key and value: ");
-				scanf("%d %d", &key, &value);	
-				ky_rbtree_add( rbTree, &key, &value );
-				break;
-			case 2:
-				printf("please input your key and value: ");
-				scanf("%d %d", &key, &value);	
-				ky_rbtree_mod( rbTree, &key, &value );
-				break;
-			case 3:
-				printf("please input yout key: ");
-				scanf("%d", &key);	
-				ky_rbtree_del( rbTree, &key );
-				break;
-			case 4:
-				printf("################################################\n");
-				preorder_traversal( rbTree->tree );
-				printf("################################################\n");
-				break;
-			case 5:
-				isQuit = 1;
-				break;
-			default:
-				break;
-		}
-
-		if ( isQuit == 1 )
-		{
-			ky_rbtree_release( rbTree );
-			break;
-		}
-	}
-	*/
-
+	key = "a";
+	ky_map_del( rbTree, key );
+	test_two_red( rbTree->tree );
+	printf("黑色路径长度: %d\n", black_count( rbTree->tree ) );
+	preorder_traversal( rbTree->tree );
+	key = "bb";
+	ky_map_del( rbTree, key );
+	test_two_red( rbTree->tree );
+	printf("黑色路径长度: %d\n", black_count( rbTree->tree ) );
+	preorder_traversal( rbTree->tree );
+	key = "ccc";
+	ky_map_del( rbTree, key );
+	test_two_red( rbTree->tree );
+	printf("黑色路径长度: %d\n", black_count( rbTree->tree ) );
+	preorder_traversal( rbTree->tree );
+	
 	return 0;
 }
 

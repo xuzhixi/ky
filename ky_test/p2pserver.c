@@ -17,7 +17,7 @@ void handle_msg(ky_reactor_t *rat, void *param)
 	{  
 		// 接收消息
 		recvLen = ky_sock_recvfrom(server, buf, sizeof(buf), &addr);
-		if ( recvLen != KY_ERROR )
+		if ( recvLen != -1 )
 		{
 			buf[ recvLen ] = '\0';
 
@@ -44,7 +44,7 @@ int main()
 	// 创建UDP套接字
 	if (ky_sock_init(&server, KY_ADDR_ANY, 5566, SOCK_DGRAM, KY_BLOCK) != 0)
 	{
-		KY_LOG_STD_ERROR("ky_sock_new error\n");
+		KY_LOG_ERROR("ky_sock_new error\n");
 		return -1;
 	}
 

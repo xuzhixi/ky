@@ -1,20 +1,22 @@
 #include <string.h>
-
-#include <ky_math.h>
-#include <ky_malloc.h>
-#include <ky_avltree.h>
+#include <stdlib.h>
+#include "ky_math.h"
+#include "ky_avltree.h"
 
 static ky_avlnode_s *ky_avltree_node_new_i(void *key, ky_avltree_key_len_t keyLen, void *value, ky_avltree_value_len_t valueLen)
 {
 	ky_avlnode_s *node;
 
-	node = (ky_avlnode_s *)ky_malloc( sizeof(ky_avlnode_s) );
+	node = (ky_avlnode_s *)malloc( sizeof(ky_avlnode_s) );
 	node->left = NULL;
 	node->right = NULL;
 	node->height = 0;
-	node->key = ky_malloc( keyLen );
+	node->key_len = keyLen;
+	node->value_len = valueLen;
+
+	node->key = malloc( keyLen );
 	memcpy( node->key, key, keyLen );
-	node->value = ky_malloc( valueLen );
+	node->value = malloc( valueLen );
 	memcpy( node->value, value, valueLen );
 
 	return node;
@@ -22,9 +24,9 @@ static ky_avlnode_s *ky_avltree_node_new_i(void *key, ky_avltree_key_len_t keyLe
 
 static void ky_avltree_node_delete_i(ky_avlnode_s *node)
 {
-	ky_free( node->key );
-	ky_free( node->value );
-	ky_free( node );
+	free( node->key );
+	free( node->value );
+	free( node );
 }
 
 static void ky_avltree_release_i(ky_avltree_s *root)
@@ -92,7 +94,7 @@ static ky_avltree_s *ky_double_rotate_with_right_i(ky_avltree_s *root)
 
 static ky_avlnode_s *ky_avltree_find_i(ky_avltree_s *root, void *key, ky_avltree_comparefun_t cmpFun)
 {
-	sint8 cmpResult;
+	int cmpResult;
 
 	while ( root != NULL && (cmpResult = cmpFun(root->key, key)) != 0 )
 	{
@@ -129,9 +131,9 @@ static ky_avlnode_s *ky_avltree_find_min_i(ky_avltree_s *root)
 	return root;
 }
 
-static ky_avltree_s *ky_avltree_add_i(ky_avltree_s *root, void *value, ky_avltree_value_len_t valueLen, void *key, ky_avltree_key_len_t keyLen, ky_avltree_comparefun_t cmpFun)
+static ky_avltree_s *ky_avltree_add_i(ky_avltree_s *root, void *key, ky_avltree_key_len_t keyLen, void *value, ky_avltree_value_len_t valueLen, ky_avltree_comparefun_t cmpFun)
 {
-	sint8 cmpResult;
+	int cmpResult;
 
 	if ( root == NULL )
 	{
@@ -142,7 +144,7 @@ static ky_avltree_s *ky_avltree_add_i(ky_avltree_s *root, void *value, ky_avltre
 	cmpResult = cmpFun(root->key, key);
 	if ( cmpResult > 0 )
 	{
-		root->left = ky_avltree_add_i(root->left, value, valueLen, key, keyLen, cmpFun);
+		root->left = ky_avltree_add_i(root->left, key, keyLen, value, valueLen, cmpFun);
 		if ( ky_avltree_height_i(root->left) - ky_avltree_height_i(root->right) == 2 )
 		{
 			if ( cmpFun(root->left->key, key) > 0 )
@@ -157,7 +159,7 @@ static ky_avltree_s *ky_avltree_add_i(ky_avltree_s *root, void *value, ky_avltre
 	}
 	else if ( cmpResult < 0 )
 	{
-		root->right = ky_avltree_add_i(root->right, value, valueLen, key, keyLen, cmpFun);
+		root->right = ky_avltree_add_i(root->right, key, keyLen, value, valueLen, cmpFun);
 		if ( ky_avltree_height_i(root->right) - ky_avltree_height_i(root->left) == 2 )
 		{
 			if ( cmpFun(root->right->key, key) < 0 )
@@ -176,18 +178,21 @@ static ky_avltree_s *ky_avltree_add_i(ky_avltree_s *root, void *value, ky_avltre
 	return root;
 }
 
-static ky_avltree_s *ky_avltree_mod_i(ky_avltree_s *root, void *value, ky_avltree_value_len_t valueLen, void *key, ky_avltree_key_len_t keyLen, ky_avltree_comparefun_t cmpFun)
+static ky_avltree_s *ky_avltree_mod_i(ky_avltree_s *root, void *key, ky_avltree_key_len_t keyLen, void *value, ky_avltree_value_len_t valueLen, ky_avltree_comparefun_t cmpFun)
 {
 	ky_avlnode_s *tNode;
 
 	tNode = ky_avltree_find_i(root, key, cmpFun);
 	if ( tNode == NULL )
 	{
-		root = ky_avltree_add_i(root, value, valueLen, key, keyLen, cmpFun);
+		root = ky_avltree_add_i(root, key, keyLen, value, valueLen, cmpFun);
 	}
 	else
 	{
+		free( tNode->value );
+		tNode->value = malloc( valueLen );
 		memcpy(tNode->value, value, valueLen);
+		tNode->value_len = valueLen;
 	}
 
 	return root;
@@ -219,9 +224,9 @@ static ky_avltree_s *ky_avltree_mod_i(ky_avltree_s *root, void *value, ky_avltre
 //	}
 //}
 
-static ky_avltree_s *ky_avltree_del_i(ky_avltree_s *root, void *key, ky_avltree_key_len_t keyLen, ky_avltree_value_len_t valueLen, ky_avltree_comparefun_t cmpFun)
+static ky_avltree_s *ky_avltree_del_i(ky_avltree_s *root, void *key, ky_avltree_comparefun_t cmpFun)
 {
-	sint8 cmpResult;
+	int cmpResult;
 
 	if ( root == NULL )
 	{
@@ -231,7 +236,7 @@ static ky_avltree_s *ky_avltree_del_i(ky_avltree_s *root, void *key, ky_avltree_
 	cmpResult = cmpFun(root->key, key);
 	if ( cmpResult > 0 )
 	{
-		root->left = ky_avltree_del_i(root->left, key, keyLen, valueLen, cmpFun);
+		root->left = ky_avltree_del_i(root->left, key, cmpFun);
 		if ( ky_avltree_height_i(root->right) - ky_avltree_height_i(root->left) == 2 )
 		{
 			if ( ky_avltree_height_i(root->right->right) > ky_avltree_height_i(root->right->left) )
@@ -247,7 +252,7 @@ static ky_avltree_s *ky_avltree_del_i(ky_avltree_s *root, void *key, ky_avltree_
 	}
 	else if ( cmpResult < 0 )
 	{
-		root->right = ky_avltree_del_i(root->right, key, keyLen, valueLen, cmpFun);
+		root->right = ky_avltree_del_i(root->right, key, cmpFun);
 		if ( ky_avltree_height_i(root->left) - ky_avltree_height_i(root->right) == 2 )
 		{
 			if ( ky_avltree_height_i(root->left->left) > ky_avltree_height_i(root->left->right) )
@@ -267,9 +272,15 @@ static ky_avltree_s *ky_avltree_del_i(ky_avltree_s *root, void *key, ky_avltree_
 		if ( root->left !=NULL && root->right != NULL )
 		{
 			tNode = ky_avltree_find_max_i(root->left);
-			memcpy(root->key, tNode->key, keyLen);
-			memcpy(root->value, tNode->value, valueLen);
-			root->left = ky_avltree_del_i(root->left, tNode->key, keyLen, valueLen, cmpFun);
+			free( root->key );
+			free( root->value );
+			root->key = malloc( tNode->key_len );
+			root->value = malloc( tNode->value_len );
+			memcpy(root->key, tNode->key, tNode->key_len);
+			memcpy(root->value, tNode->value, tNode->value_len);
+			root->key_len = tNode->key_len;
+			root->value_len = tNode->value_len;
+			root->left = ky_avltree_del_i(root->left, tNode->key, cmpFun);
 			if ( ky_avltree_height_i(root->right) - ky_avltree_height_i(root->left) == 2 )
 			{
 				if ( ky_avltree_height_i(root->right->right) > ky_avltree_height_i(root->right->left) )
@@ -306,7 +317,7 @@ ky_avltree_t *ky_avltree_new(ky_avltree_key_len_t keyLen, ky_avltree_value_len_t
 {
 	ky_avltree_t *avltree;
 
-	avltree =  (ky_avltree_t *)ky_malloc( sizeof(ky_avltree_t) );
+	avltree =  (ky_avltree_t *)malloc( sizeof(ky_avltree_t) );
 	avltree->key_len = keyLen;
 	avltree->value_len = valueLen;
 	avltree->cmp_fun = cmpFun;
@@ -324,18 +335,18 @@ void ky_avltree_clear(ky_avltree_t *avltree)
 void ky_avltree_release(ky_avltree_t *avltree)
 {
 	ky_avltree_clear( avltree );
-	ky_free( avltree );
+	free( avltree );
 }
 
-bool ky_avltree_is_null(ky_avltree_t *avltree)
+int ky_avltree_is_null(ky_avltree_t *avltree)
 {
 	if ( avltree->tree == NULL )
 	{
-		return KY_TRUE;
+		return 1;
 	}
 	else
 	{
-		return KY_FALSE;
+		return 0;
 	}
 }
 
@@ -386,16 +397,26 @@ void *key_avltree_find_min(ky_avltree_t *avltree)
 
 void ky_avltree_add(ky_avltree_t *avltree, void *key, void *value)
 {
-	avltree->tree = ky_avltree_add_i(avltree->tree, value, avltree->value_len, key, avltree->key_len, avltree->cmp_fun);
+	avltree->tree = ky_avltree_add_i(avltree->tree, key, avltree->key_len, value, avltree->value_len, avltree->cmp_fun);
+}
+
+void ky_avltree_addv(ky_avltree_t *avltree, void *key, ky_avltree_key_len_t keyLen, void *value, ky_avltree_value_len_t valueLen)
+{
+	avltree->tree = ky_avltree_add_i(avltree->tree, key, keyLen, value, valueLen, avltree->cmp_fun);
 }
 
 void ky_avltree_mod(ky_avltree_t *avltree, void *key, void *value)
 {
-	avltree->tree = ky_avltree_mod_i(avltree->tree, value, avltree->value_len, key, avltree->key_len, avltree->cmp_fun);
+	avltree->tree = ky_avltree_mod_i(avltree->tree, key, avltree->key_len, value, avltree->value_len, avltree->cmp_fun);
+}
+
+void ky_avltree_modv(ky_avltree_t *avltree, void *key, ky_avltree_key_len_t keyLen, void *value, ky_avltree_value_len_t valueLen)
+{
+	avltree->tree = ky_avltree_mod_i(avltree->tree, key, keyLen, value, valueLen, avltree->cmp_fun);
 }
 
 void ky_avltree_del(ky_avltree_t *avltree, void *key)
 {
-	avltree->tree = ky_avltree_del_i(avltree->tree, key, avltree->key_len, avltree->value_len, avltree->cmp_fun);
+	avltree->tree = ky_avltree_del_i(avltree->tree, key, avltree->cmp_fun);
 }
 

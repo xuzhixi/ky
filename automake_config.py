@@ -17,7 +17,7 @@ g_compilers_opt = "-W -Wall -Wpointer-arith -pipe -D_REENTRANT -O3" # 编译选�
 g_debug_compilers_opt = "-W -Wall -Wpointer-arith -pipe -D_REENTRANT"   # debug的编译选项
 
 g_include_opt = ""  # 包含的头文件选项
-g_libs_opt = "-lpthread" # 包含的动态库选项
+g_libs_opt = "-lpthread -L/usr/lib/mysql -lmysqlclient" # 包含的动态库选项
 
 g_ar_opt = "" # 编译静态库时, ar命令的选项
 

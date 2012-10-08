@@ -4,8 +4,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#include <ky_types.h>
-
 /// 表示任意的IP
 #define KY_ADDR_ANY "0.0.0.0"
 /// 表示任意的端口 
@@ -15,7 +13,7 @@
 /// 表示非阻塞的socket
 #define KY_NOBLOCK 0
 
-#ifdef _CPLUSPLUS
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -45,37 +43,37 @@ typedef struct ky_address_t
  * @param  port		绑定的端口
  * @param  type		socket的类型; SOCK_STREAM表示TCP，SOCK_DGRAM表示UDP
  * @param  block	是否是阻塞的socket; KY_BLOCK表示阻塞，KY_NOBLOCK表示非阻塞
- * @retval KY_OK	表示成功
- * @retval KY_ERROR 表示失败
+ * @retval 0	表示成功
+ * @retval -1 表示失败
  */
-extern sint8 ky_sock_init(ky_socket_t *sk, const char *ip, uint16 port, sint16 type, sint8 block);
+extern int ky_sock_init(ky_socket_t *sk, const char *ip, unsigned int port, int type, int block);
 /**
  * @brief 监听一个socket
  * 
  * @param  sk			要监听的socket
  * @param  maxWaitCount	允许的最大等待队列(即未accept的socket连接)
- * @retval KY_OK		表示成功
- * @retval KY_ERROR		表示失败
+ * @retval 0		表示成功
+ * @retval -1		表示失败
  */
-extern sint8 ky_sock_listen(ky_socket_t *sk, int maxWaitCount);
+extern int ky_sock_listen(ky_socket_t *sk, int maxWaitCount);
 /**
  * @brief 接受一个socket连接
  *
  * @param  clientSk		保存接受的socket
  * @param  block		设置接受的socket阻塞类型; KY_BLOCK表示阻塞，KY_NOBLOCK表示非阻塞
  * @param  serverSk		从serverSk接受一个socket连接
- * @retval KY_OK		表示成功
- * @retval KY_ERROR		表示失败
+ * @retval 0		表示成功
+ * @retval -1		表示失败
  */
-extern sint8 ky_sock_accept(ky_socket_t *clientSk, sint8 block, ky_socket_t *serverSk);
+extern int ky_sock_accept(ky_socket_t *clientSk, int block, ky_socket_t *serverSk);
 /**
  * @brief 关闭一个socket
  *
  * @param  sk			要关闭的socket
- * @retval KY_OK		表示成功
- * @retval KY_ERROR		表示失败
+ * @retval 0		表示成功
+ * @retval -1		表示失败
  */
-extern sint8 ky_sock_close(ky_socket_t *sk);
+extern int ky_sock_close(ky_socket_t *sk);
 /**
  * @brief 初始化一个地址结构
  *
@@ -83,7 +81,7 @@ extern sint8 ky_sock_close(ky_socket_t *sk);
  * @param  ip			ip地址
  * @param  port			端口
  */
-extern void ky_address_init(ky_address_t *address, const char *ip, uint16 port);
+extern void ky_address_init(ky_address_t *address, const char *ip, unsigned int port);
 /**
  * @brief 用sk连接到address所指的地址
  *
@@ -91,10 +89,10 @@ extern void ky_address_init(ky_address_t *address, const char *ip, uint16 port);
  *
  * @param  sk			本地的socket
  * @param  address		要连接的对端地址
- * @retval KY_OK		表示成功
- * @retval KY_ERROR		表示失败
+ * @retval 0		表示成功
+ * @retval -1		表示失败
  */
-extern sint8 ky_sock_connect(ky_socket_t *sk, ky_address_t *address);
+extern int ky_sock_connect(ky_socket_t *sk, ky_address_t *address);
 
 /**
  * @brief 通过TCP发送一个数据包
@@ -151,7 +149,7 @@ extern const char *ky_sock_get_ip(ky_socket_t *sk, char *dst, socklen_t dstLen);
  * @param  sk			socket
  * @return				socket绑定的端口
  */
-extern uint16 ky_sock_get_port(ky_socket_t *sk);
+extern unsigned int ky_sock_get_port(ky_socket_t *sk);
 /**
  * @brief 与ky_sock_get_ip函数一样，不同的是这里通过 address 来获取
  *
@@ -163,10 +161,10 @@ extern const char *ky_address_get_ip(ky_address_t *address, char *dst, socklen_t
  *
  * @see ky_sock_get_port()
  */
-extern uint16 ky_address_get_port(ky_address_t *address);
+extern unsigned int ky_address_get_port(ky_address_t *address);
 
 
-#ifdef _CPLUSPLUS
+#ifdef __cplusplus
 }
 #endif
 

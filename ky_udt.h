@@ -1,10 +1,10 @@
 #ifndef _KY_UDT_H
 #define _KY_UDT_H
 
-#include <ky_socket.h>
-#include <ky_map.h>
+#include "ky_socket.h"
+#include "ky_map.h"
 
-#ifdef _CPLUSPLUS
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -18,7 +18,7 @@ typedef struct ky_udt_t
 extern ssize_t ky_udt_sendto(ky_udt_t *udt, const char *buf, size_t sendLen, ky_address_t *addr);
 extern ssize_t ky_udt_recvfrom(ky_udt_t *udt, char *buf, size_t bufLen, ky_address_t *addr);
 
-#ifdef _CPLUSPLUS
+#ifdef __cplusplus
 }
 #endif
 

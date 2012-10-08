@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <ky_core.h>
+#include "ky_tool.h"
 
 int main()
 {
@@ -15,7 +14,7 @@ int main()
 	//	printf("minute: %d\n", minute);
 	//}
 	
-	printf("RAND_MAX: %d result: %d\n", RAND_MAX, ky_rand(1,9));
+	printf("RAND_MAX: %d result: %d\n", RAND_MAX, ky_rand(1,100));
 
 	return 0;
 }

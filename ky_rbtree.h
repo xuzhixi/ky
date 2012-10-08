@@ -2,11 +2,11 @@
 #define _KY_RBTREE_H
 
 #include <sys/types.h>
-#include <ky_types.h>
 
-#ifdef _CPLUSPLUS
+#ifdef __cplusplus
 extern "C" {
 #endif
+
 
 /// 红黑树的颜色
 typedef enum ky_rbtree_color_t
@@ -14,6 +14,9 @@ typedef enum ky_rbtree_color_t
 	KY_RBTREE_RED = 0,
 	KY_RBTREE_BLACK = 1
 }ky_rbtree_color_t;
+
+typedef size_t ky_rbtree_key_len_t;
+typedef size_t ky_rbtree_value_len_t;
 
 /// 红黑树的一个节点，内部使用的结构体
 typedef struct ky_rbtree_s
@@ -24,11 +27,11 @@ typedef struct ky_rbtree_s
 	ky_rbtree_color_t color;
 	void *key;
 	void  *value;
+	ky_rbtree_key_len_t key_len;
+	ky_rbtree_value_len_t value_len;
 }ky_rbnode_s, ky_rbtree_s;
 
-typedef size_t ky_rbtree_key_len_t;
-typedef size_t ky_rbtree_value_len_t;
-typedef sint8 (*ky_rbtree_comparefun_t)(void *, void *);
+typedef int (*ky_rbtree_comparefun_t)(void *, void *);
 
 /// 红黑树的结构体
 typedef struct ky_rbtree_t
@@ -65,16 +68,17 @@ extern void ky_rbtree_release(ky_rbtree_t *rbtree);
 /**
  * @brief 判断红黑树是否为空 
  *
- * @retval  KY_TRUE		为空
- * @retval	KY_FALSE	不为空
+ * @retval  1	为空
+ * @retval	0	不为空
  */
-extern bool ky_rbtree_is_null(ky_rbtree_t *rbtree);
+extern int ky_rbtree_is_null(ky_rbtree_t *rbtree);
 /**
  * @brief 在红黑树中添加一个键值对
  *
  * 红黑树保存的键值对，是key、value所指内容的一个copy
  */
 extern void ky_rbtree_add(ky_rbtree_t *rbtree, void *key, void *value);
+extern void ky_rbtree_addv(ky_rbtree_t *rbtree, void *key, ky_rbtree_key_len_t keyLen, void *value, ky_rbtree_value_len_t valueLen);
 /**
  * @brief 修改红黑树的键值对
  *
@@ -82,6 +86,7 @@ extern void ky_rbtree_add(ky_rbtree_t *rbtree, void *key, void *value);
  * 如果红黑树中不存在这个key, 则把这个键值对插入到红黑树中
  */
 extern void ky_rbtree_mod(ky_rbtree_t *rbtree, void *key, void *value);
+extern void ky_rbtree_modv(ky_rbtree_t *rbtree, void *key, ky_rbtree_key_len_t keyLen, void *value, ky_rbtree_value_len_t valueLen);
 /**
  * @brief 删除红黑树的键值对
  */
@@ -102,7 +107,8 @@ extern void *ky_rbtree_find_max(ky_rbtree_t *rbtree);
  */
 extern void *key_rbtree_find_min(ky_rbtree_t *rbtree);
 
-#ifdef _CPLUSPLUS
+
+#ifdef __cplusplus
 }
 #endif
 

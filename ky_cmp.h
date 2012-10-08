@@ -1,7 +1,7 @@
 #ifndef _KY_CMP_H
 #define _KY_CMP_H
 
-#ifdef _CPLUSPLUS
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -16,9 +16,10 @@ extern "C" {
  * @retval -1	如果 *val1 小于 *val2
  * @retval 0	如果 *val1 等于 *val2
  */
-extern sint8 ky_cmp_int(void *val1, void *val2);
+extern int ky_cmp_int(void *val1, void *val2);
+extern int ky_cmp_str(void *val1, void *val2);
 
-#ifdef _CPLUSPLUS
+#ifdef __cplusplus
 }
 #endif
 

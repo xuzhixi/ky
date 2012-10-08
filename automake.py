@@ -18,7 +18,7 @@ g_newLine = g_tabKey
 g_mid_ext = ".o"			# 中间文件扩展名
 g_debug_mid_ext = ".od"		# debug中间文件扩展名
 
-includeReg = ur'''^\s*#include\s*<(ky.+?\.h)>\s*$'''		# 获取所包含头文件的正则表达式
+includeReg = ur'''^\s*#include\s*"(ky_.+?\.h)"\s*$'''		# 获取所包含头文件的正则表达式
 sourceItemList = None
 headerItemList = None
 

@@ -1,12 +1,11 @@
 #include <string.h>
+#include <stdlib.h>
 #include <sys/epoll.h>
+#include "ky_socket.h"
+#include "ky_reactor.h"
+#include "ky_cmp.h"
 
-#include <ky_socket.h>
-#include <ky_reactor.h>
-#include <ky_malloc.h>
-#include <ky_cmp.h>
-
-static sint8 ky_cmp_event_t(void *val1, void *val2)
+static int ky_cmp_event_t(void *val1, void *val2)
 {
 	ky_event_t *evt1 = val1;
 	ky_event_t *evt2 = val2;
@@ -25,11 +24,11 @@ static sint8 ky_cmp_event_t(void *val1, void *val2)
 	}
 }
 
-ky_reactor_t *ky_reactor_new(int size, uint32 model)
+ky_reactor_t *ky_reactor_new(int size, unsigned int model)
 {
 	ky_reactor_t *rat;
 
-	rat = ky_malloc( sizeof(ky_reactor_t) );
+	rat = malloc( sizeof(ky_reactor_t) );
 	rat->register_skfd_tree = ky_map_new(sizeof(int), sizeof(ky_skfd_t), ky_cmp_int);
 	rat->delay_del_list = ky_linklist_new(sizeof(ky_reactor_delay_del_t), NULL);
 	rat->epfd = epoll_create(size);     // 建立一个epoll,最多可以监听size个fd 
@@ -42,10 +41,10 @@ void ky_reactor_release(ky_reactor_t *rat)
 {
 	ky_map_release( rat->register_skfd_tree );
 	ky_linklist_release( rat->delay_del_list );
-	ky_free( rat );
+	free( rat );
 }
 
-void ky_reactor_add(ky_reactor_t *rat, ky_socket_t *sk, uint32 eventType, ky_reactor_callback_t callback, void *param, size_t paramLen)
+void ky_reactor_add(ky_reactor_t *rat, ky_socket_t *sk, unsigned int eventType, ky_reactor_callback_t callback, void *param, size_t paramLen)
 {
 	ky_event_t event;
 	ky_skfd_t *skfdNode;
@@ -53,7 +52,7 @@ void ky_reactor_add(ky_reactor_t *rat, ky_socket_t *sk, uint32 eventType, ky_rea
 	// set ky_event_t
 	event.event_type = eventType;
 	event.callback = callback;                  // 设置回调函数
-	event.param = ky_malloc( paramLen );
+	event.param = malloc( paramLen );
 	memcpy( event.param, param, paramLen );    // 设置回调函数的参数
 
 	skfdNode = ky_map_find( rat->register_skfd_tree, &(sk->fd) );
@@ -79,7 +78,7 @@ void ky_reactor_add(ky_reactor_t *rat, ky_socket_t *sk, uint32 eventType, ky_rea
 	}
 }
 
-void ky_reactor_mod(ky_reactor_t *rat, ky_socket_t *sk, uint32 eventType, ky_reactor_callback_t callback, void *param, size_t paramLen)
+void ky_reactor_mod(ky_reactor_t *rat, ky_socket_t *sk, unsigned int eventType, ky_reactor_callback_t callback, void *param, size_t paramLen)
 {
 	ky_skfd_t *skfd;
 	ky_event_t event;
@@ -100,15 +99,15 @@ void ky_reactor_mod(ky_reactor_t *rat, ky_socket_t *sk, uint32 eventType, ky_rea
 		}
 		else
 		{
-			ky_free( eventNode->param );
-			eventNode->param = ky_malloc( paramLen );
+			free( eventNode->param );
+			eventNode->param = malloc( paramLen );
 			memcpy( eventNode->param, param, paramLen );
 			eventNode->callback = callback;
 		}
 	}
 }
 
-void ky_reactor_del(ky_reactor_t *rat, ky_socket_t *sk, uint32 eventType)
+void ky_reactor_del(ky_reactor_t *rat, ky_socket_t *sk, unsigned int eventType)
 {
 	ky_skfd_t *skfd;
 	ky_event_t event;
@@ -119,7 +118,7 @@ void ky_reactor_del(ky_reactor_t *rat, ky_socket_t *sk, uint32 eventType)
 	{
 		event.event_type = eventType;
 		eventNode = ky_linklist_find( skfd->register_event_list, &event );
-		ky_free( eventNode->param );
+		free( eventNode->param );
 		ky_linklist_del( skfd->register_event_list, &event );
 
 		if ( ky_linklist_is_null(skfd->register_event_list) )
@@ -149,7 +148,7 @@ void ky_reactor_del_sock(ky_reactor_t *rat, ky_socket_t *sk)
 	}   
 }
 
-void ky_reactor_del_delay(ky_reactor_t *rat, ky_socket_t *sk, uint32 eventType)
+void ky_reactor_del_delay(ky_reactor_t *rat, ky_socket_t *sk, unsigned int eventType)
 {
 	ky_reactor_delay_del_t delayDel;
 

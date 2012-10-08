@@ -1,7 +1,7 @@
-#include <ky_types.h>
-#include <ky_cmp.h>
+#include <string.h>
+#include "ky_cmp.h"
 
-sint8 ky_cmp_int(void *val1, void *val2)
+int ky_cmp_int(void *val1, void *val2)
 {
 	int *value1 = val1;
 	int *value2 = val2;
@@ -18,4 +18,9 @@ sint8 ky_cmp_int(void *val1, void *val2)
 	{
 		return 0;
 	}
+}
+
+int ky_cmp_str(void *val1, void *val2)
+{
+	return strcmp(val1, val2);
 }
