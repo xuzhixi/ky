@@ -8,11 +8,16 @@
 
 unsigned int ky_rand(unsigned int start, unsigned int end)
 {
+	static time_t lastTime = 0;
 	unsigned int scopeLen;
 	unsigned int result;
 
 	scopeLen = end - start + 1;
-	srand( time(NULL) );
+	if ( lastTime != time(NULL) )
+	{
+		lastTime = time(NULL);
+		srand( lastTime );
+	}
 	result = ( rand() % scopeLen  ) + start;
 
 	return result;

@@ -15,6 +15,10 @@ int main()
 	//}
 	
 	printf("RAND_MAX: %d result: %d\n", RAND_MAX, ky_rand(1,100));
+	printf("RAND_MAX: %d result: %d\n", RAND_MAX, ky_rand(1,100));
+	printf("RAND_MAX: %d result: %d\n", RAND_MAX, ky_rand(1,100));
+	printf("RAND_MAX: %d result: %d\n", RAND_MAX, ky_rand(1,100));
+	printf("RAND_MAX: %d result: %d\n", RAND_MAX, ky_rand(1,100));
 
 	return 0;
 }
