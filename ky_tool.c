@@ -38,6 +38,7 @@ int ky_save_pid_file(const char *fileName)
 		return -1;
 	}
 	fprintf(fp, "%d\n",  getpid());
+	fclose(fp);
 
 	return 0;
 }

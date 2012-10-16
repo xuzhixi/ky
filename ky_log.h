@@ -22,7 +22,7 @@
 #define KY_LOG_WARN(format, ...)  ky_log_msg(g_ky_log_default, KY_LOG_LEVEL_WARN,  __FILE__, __LINE__, format, ##__VA_ARGS__)
 #define KY_LOG_ERROR(format, ...) ky_log_msg(g_ky_log_default, KY_LOG_LEVEL_ERROR, __FILE__, __LINE__, format, ##__VA_ARGS__)
 #define KY_LOG_FATAL(format, ...) ky_log_msg(g_ky_log_default, KY_LOG_LEVEL_FATAL, __FILE__, __LINE__, format, ##__VA_ARGS__)
-#define ky_log_close_default()	  ky_log_close(g_ky_log_default)
+#define ky_log_close_default()	  ky_log_close(g_ky_log_default);g_ky_log_default=NULL
 
 #ifdef __cplusplus
 extern "C" {
