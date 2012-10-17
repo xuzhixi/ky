@@ -1,3 +1,17 @@
+//===============================================
+/**
+ *  @file ky_reactor.h
+ *
+ *  @author XuZhiXi
+ *  Email   932834199@qq.com or 932834199@163.com
+ *
+ *  Create datetime:  2012-10-17 08:12:59
+ *  Last   modified:  2012-10-17 08:12:59
+ *
+ *  Description: 
+ */
+//================================================
+
 #ifndef _KY_REACTOR_H
 #define _KY_REACTOR_H
 

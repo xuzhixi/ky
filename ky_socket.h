@@ -1,3 +1,17 @@
+//===============================================
+/**
+ *  @file ky_socket.h
+ *
+ *  @author XuZhiXi
+ *  Email   932834199@qq.com or 932834199@163.com
+ *
+ *  Create datetime:  2012-10-17 08:13:15
+ *  Last   modified:  2012-10-17 08:13:15
+ *
+ *  Description: 
+ */
+//================================================
+
 #ifndef _KY_SOCKET_H
 #define _KY_SOCKET_H
 

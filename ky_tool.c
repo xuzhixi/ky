@@ -1,3 +1,17 @@
+//===============================================
+/**
+ *  @file ky_tool.c
+ *
+ *  @author XuZhiXi
+ *  Email   932834199@qq.com or 932834199@163.com
+ *
+ *  Create datetime:  2012-10-17 08:15:29
+ *  Last   modified:  2012-10-17 08:15:29
+ *
+ *  Description: 
+ */
+//================================================
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>

@@ -1,3 +1,17 @@
+//===============================================
+/**
+ *  @file ky_tool.h
+ *
+ *  @author XuZhiXi
+ *  Email   932834199@qq.com or 932834199@163.com
+ *
+ *  Create datetime:  2012-10-17 08:15:27
+ *  Last   modified:  2012-10-17 08:15:27
+ *
+ *  Description: 
+ */
+//================================================
+
 #ifndef _KY_CORE_H
 #define _KY_CORE_H
 

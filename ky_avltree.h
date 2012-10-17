@@ -1,3 +1,17 @@
+//===============================================
+/**
+ *  @file ky_avltree.h
+ *
+ *  @author XuZhiXi
+ *  Email   932834199@qq.com or 932834199@163.com
+ *
+ *  Create datetime:  2012-10-17 08:11:10
+ *  Last   modified:  2012-10-17 08:11:10
+ *
+ *  Description: 
+ */
+//================================================
+
 #ifndef _KY_AVLTREE_H
 #define _KY_AVLTREE_H
 

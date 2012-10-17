@@ -1,3 +1,17 @@
+//===============================================
+/**
+ *  @file ky_reactor.c
+ *
+ *  @author XuZhiXi
+ *  Email   932834199@qq.com or 932834199@163.com
+ *
+ *  Create datetime:  2012-10-17 08:13:09
+ *  Last   modified:  2012-10-17 08:13:09
+ *
+ *  Description: 
+ */
+//================================================
+
 #include <string.h>
 #include <stdlib.h>
 #include <sys/epoll.h>

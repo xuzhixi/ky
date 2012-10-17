@@ -1,3 +1,17 @@
+//===============================================
+/**
+ *  @file ky_linklist.h
+ *
+ *  @author XuZhiXi
+ *  Email   932834199@qq.com or 932834199@163.com
+ *
+ *  Create datetime:  2012-10-17 08:11:38
+ *  Last   modified:  2012-10-17 08:11:38
+ *
+ *  Description: 
+ */
+//================================================
+
 #ifndef _KY_LINKLIST_H
 #define _KY_LINKLIST_H
 

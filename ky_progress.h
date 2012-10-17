@@ -1,3 +1,17 @@
+//===============================================
+/**
+ *  @file ky_progress.h
+ *
+ *  @author XuZhiXi
+ *  Email   932834199@qq.com or 932834199@163.com
+ *
+ *  Create datetime:  2012-10-17 08:12:40
+ *  Last   modified:  2012-10-17 08:12:40
+ *
+ *  Description: 
+ */
+//================================================
+
 #ifndef _KY_PROGRESS_H
 #define _KY_PROGRESS_H
 

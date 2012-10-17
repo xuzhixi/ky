@@ -1,3 +1,17 @@
+//===============================================
+/**
+ *  @file ky_time.c
+ *
+ *  @author XuZhiXi
+ *  Email   932834199@qq.com or 932834199@163.com
+ *
+ *  Create datetime:  2012-10-17 08:15:23
+ *  Last   modified:  2012-10-17 08:15:23
+ *
+ *  Description: 
+ */
+//================================================
+
 #include <stdio.h>
 #include <string.h>
 #include "ky_time.h"

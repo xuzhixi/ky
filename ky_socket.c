@@ -1,3 +1,17 @@
+//===============================================
+/**
+ *  @file ky_socket.c
+ *
+ *  @author XuZhiXi
+ *  Email   932834199@qq.com or 932834199@163.com
+ *
+ *  Create datetime:  2012-10-17 08:13:18
+ *  Last   modified:  2012-10-17 08:13:18
+ *
+ *  Description: 
+ */
+//================================================
+
 #include <unistd.h>
 #include <string.h>
 #include <arpa/inet.h>
