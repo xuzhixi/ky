@@ -6,7 +6,7 @@
  *  Email   932834199@qq.com or 932834199@163.com
  *
  *  Create datetime:  2012-10-17 08:11:48
- *  Last   modified:  2012-10-17 08:11:48
+ *  Last   modified:  2012-10-25 13:59:47
  *
  *  Description: 
  */
@@ -22,7 +22,7 @@
 #endif
 
 #define KY_LOG_FILENAME_MAXSIZE 150
-#define KY_LOG_MSG_MAXSIZE 256
+#define KY_LOG_MSG_MAXSIZE 1024
 
 #define ky_log_debug(log, format, ...) ky_log_msg(log, KY_LOG_LEVEL_DEBUG, __FILE__, __LINE__, format, ##__VA_ARGS__) 
 #define ky_log_info(log, format, ...)  ky_log_msg(log, KY_LOG_LEVEL_INFO,  __FILE__, __LINE__, format, ##__VA_ARGS__)
