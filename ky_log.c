@@ -6,7 +6,7 @@
  *  Email   932834199@qq.com or 932834199@163.com
  *
  *  Create datetime:  2012-10-17 08:11:50
- *  Last   modified:  2012-10-17 08:11:50
+ *  Last   modified:  2012-10-25 23:55:41
  *
  *  Description: 
  */
@@ -198,12 +198,12 @@ void ky_log_msg(ky_log_t *log, ky_log_level_t level, const char* fileName, int l
 	{
 		return;
 	}
-
-	//fprintf(log->fd, "%s %-6s#%s\n", ky_now(dateTime, 20, "yyyy-MM-dd hh:mm:ss"), levelStr, msg);
-	fprintf(log->fd, "%s %-6s#FileName:%s Line:%d#%s\n", ky_now(dateTime, 20, "yyyy-MM-dd hh:mm:ss"), levelStr, fileName, lineNum, msg);
 #ifdef __linux
 	 pthread_mutex_unlock( &(log->mutex) );
 #endif
+
+	//fprintf(log->fd, "%s %-6s#%s\n", ky_now(dateTime, 20, "yyyy-MM-dd hh:mm:ss"), levelStr, msg);
+	fprintf(log->fd, "%s %-6s#FileName:%s Line:%d#%s\n", ky_now(dateTime, 20, "yyyy-MM-dd hh:mm:ss"), levelStr, fileName, lineNum, msg);
 }
 
 int ky_log_redirect_std(const char *fileName, const char *openMode)
