@@ -29,17 +29,17 @@ int main()
 	//fprintf(stderr, "end----------------------end\n");
 
 	int i;
-	g_ky_log_default = ky_log_open("stdout", "w", KY_LOG_LEVEL_ALL, 0, 0);
+	//g_ky_log_default = ky_log_open("stdout", "w", KY_LOG_LEVEL_ALL, 0, 0);
 	//g_ky_log_default = ky_log_open("ky.log", "w", KY_LOG_LEVEL_ALL, 1, 0);
 	//g_ky_log_default = ky_log_open("ky.log", "w", KY_LOG_LEVEL_ALL, 2, 5 * 1024 * 1024);
-	for (i=0; i<100000; i++)
+	for (i=0; i<1; i++)
 	{
 		KY_LOG_ERROR("testId: %d", 100);
 		KY_LOG_WARN("testId: %d", 100);
 		KY_LOG_INFO("testId: %d", 100);
-		KY_LOG_INFO("testId: %s %s", __DATE__, __TIME__);
+		KY_LOG_DEBUG("testId: %s %s", __DATE__, __TIME__);
 	}
-	ky_log_close( g_ky_log_default );
+	//ky_log_close( g_ky_log_default );
 
 	return 0;
 }

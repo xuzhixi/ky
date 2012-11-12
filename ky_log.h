@@ -6,7 +6,7 @@
  *  Email   932834199@qq.com or 932834199@163.com
  *
  *  Create datetime:  2012-10-17 08:11:48
- *  Last   modified:  2012-10-25 13:59:47
+ *  Last   modified:  2012-11-12 18:13:36
  *
  *  Description: 
  */
@@ -99,7 +99,7 @@ extern void ky_log_close(ky_log_t *log);
  * @param  lineNum		记录日志所在的行号
  * @param  format		记录的日志消息，使用方法和printf一样
  */
-extern void ky_log_msg(ky_log_t *log, ky_log_level_t level, const char* fileName, int lineNum, const char *format, ...);
+extern void ky_log_msg(ky_log_t *log, ky_log_level_t level, const char* fileName, int lineNum, const char *format, ...) __attribute__(( format(printf, 5, 6) ));
 
 /**
  * @brief 重定向stdout、stderr到指定的文件中

@@ -6,7 +6,7 @@
  *  Email   932834199@qq.com or 932834199@163.com
  *
  *  Create datetime:  2012-10-17 08:11:50
- *  Last   modified:  2012-10-25 23:55:41
+ *  Last   modified:  2012-11-13 00:41:54
  *
  *  Description: 
  */
@@ -117,7 +117,7 @@ void ky_log_msg(ky_log_t *log, ky_log_level_t level, const char* fileName, int l
 {
 	char msg[KY_LOG_MSG_MAXSIZE];
 	char dateTime[20];
-	char levelStr[10];
+	const char *levelStr;
 	ky_time_t t;
 	struct stat fileInfo;
 	va_list ap;  
@@ -125,22 +125,22 @@ void ky_log_msg(ky_log_t *log, ky_log_level_t level, const char* fileName, int l
 	switch ( level )
 	{
 		case KY_LOG_LEVEL_FATAL:
-			strcpy( levelStr, "FATAL" );
+			levelStr = "FATAL";
 			break;
 		case KY_LOG_LEVEL_ERROR:
-			strcpy( levelStr, "ERROR" );
+			levelStr = "ERROR";
 			break;
 		case KY_LOG_LEVEL_WARN: 
-			strcpy( levelStr, "WARN" );
+			levelStr = "WARN";
 			break;
 		case KY_LOG_LEVEL_INFO:
-			strcpy( levelStr, "INFO" );
+			levelStr = "INFO";
 			break;
 		case KY_LOG_LEVEL_DEBUG:
-			strcpy( levelStr, "DEBUG" );
+			levelStr = "DEBUG";
 			break;
 		default:
-			strcpy( levelStr, "UNKNOWN" );
+			levelStr = "UNKNOWN";
 			break;
 	}
 
