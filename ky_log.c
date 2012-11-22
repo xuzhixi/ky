@@ -155,6 +155,13 @@ void ky_log_msg(ky_log_t *log, ky_log_level_t level, const char* fileName, int l
 		return;
 	}
 
+	if ( level > log->level )
+	{
+		return;
+	}
+	//fprintf(log->fd, "%s %-6s#%s\n", ky_now(dateTime, 20, "yyyy-MM-dd hh:mm:ss"), levelStr, msg);
+	fprintf(log->fd, "%s %-6s#FileName:%s Line:%d#%s\n", ky_now(dateTime, 20, "yyyy-MM-dd hh:mm:ss"), levelStr, fileName, lineNum, msg);
+
 #ifdef __linux
 	pthread_mutex_lock( &(log->mutex) );
 #endif
@@ -193,17 +200,9 @@ void ky_log_msg(ky_log_t *log, ky_log_level_t level, const char* fileName, int l
 			}
 		}
 	}
-
-	if ( level > log->level )
-	{
-		return;
-	}
 #ifdef __linux
 	 pthread_mutex_unlock( &(log->mutex) );
 #endif
-
-	//fprintf(log->fd, "%s %-6s#%s\n", ky_now(dateTime, 20, "yyyy-MM-dd hh:mm:ss"), levelStr, msg);
-	fprintf(log->fd, "%s %-6s#FileName:%s Line:%d#%s\n", ky_now(dateTime, 20, "yyyy-MM-dd hh:mm:ss"), levelStr, fileName, lineNum, msg);
 }
 
 int ky_log_redirect_std(const char *fileName, const char *openMode)
