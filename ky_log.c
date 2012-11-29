@@ -27,11 +27,11 @@ static void ky_log_split_name(char *dst, const char *logFileName, int splitType)
 {
 	char dateTime[20];
 
-	if ( splitType == 1 )
+	if ( splitType == KY_LOG_SPLIT_DATE )
 	{
 		sprintf(dst, "%s_%s", logFileName, ky_now(dateTime, 20, "yyyy-MM-dd"));
 	}
-	else if ( splitType == 2 )
+	else if ( splitType == KY_LOG_SPLIT_SIZE )
 	{
 		sprintf(dst, "%s_%s", logFileName, ky_now(dateTime, 20, "yyyy-MM-dd_hh-mm-ss"));
 	}
@@ -50,7 +50,7 @@ static FILE *ky_log_open_file(const char *fileName, const char *openMode)
 	return fd;
 }
 
-ky_log_t *ky_log_open(const char *logFile, const char *openMode, ky_log_level_t level, int splitType, long splitSize)
+ky_log_t *ky_log_open(const char *logFile, const char *openMode, ky_log_level_t level, ky_log_split_t splitType, long splitSize)
 {
 	ky_time_t t;
 	ky_log_t *log;
@@ -68,7 +68,7 @@ ky_log_t *ky_log_open(const char *logFile, const char *openMode, ky_log_level_t 
 	{
 		char splitFileName[KY_LOG_FILENAME_MAXSIZE];
 
-		if (splitType != 0)
+		if (splitType != KY_LOG_SPLIT_NO)
 		{
 			ky_localtime( &t );
 			ky_log_split_name(splitFileName, logFile, splitType);	
@@ -166,12 +166,12 @@ void ky_log_msg(ky_log_t *log, ky_log_level_t level, const char* fileName, int l
 	pthread_mutex_lock( &(log->mutex) );
 #endif
 	// 按日分割日志
-	if ( log->split_type != 0 && strcmp(log->file_name, "stdout") !=0 && strcmp(log->file_name, "stderr") != 0 )
+	if ( log->split_type != KY_LOG_SPLIT_NO && strcmp(log->file_name, "stdout") !=0 && strcmp(log->file_name, "stderr") != 0 )
 	{
 		char splitFileName[KY_LOG_FILENAME_MAXSIZE];
 		FILE *out;
 
-		if ( log->split_type == 1 )
+		if ( log->split_type == KY_LOG_SPLIT_DATE )
 		{
 			ky_localtime( &t );			
 			if ( log->day != t.day )
@@ -185,7 +185,7 @@ void ky_log_msg(ky_log_t *log, ky_log_level_t level, const char* fileName, int l
 				}
 			}
 		}
-		else if ( log->split_type == 2 )	// 按大小分割日志
+		else if ( log->split_type == KY_LOG_SPLIT_SIZE )	// 按大小分割日志
 		{
 			fstat(fileno(log->fd), &fileInfo);
 			if ( fileInfo.st_size > log->split_size  )

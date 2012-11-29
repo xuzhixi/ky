@@ -55,12 +55,20 @@ typedef enum ky_log_level_t
 	KY_LOG_LEVEL_ALL
 }ky_log_level_t;
 
+/// 日志切割方式
+typedef enum ky_log_split_t
+{
+	KY_LOG_SPLIT_NO,		///< 不切割
+	KY_LOG_SPLIT_DATE,		///< 按日切割
+	KY_LOG_SPLIT_SIZE		///< 按大小切割
+}ky_log_split_t;
+
 /// 日志结构体
 typedef struct ky_log_t
 {
 	FILE *fd;	
 	char *file_name;
-	int   split_type;			///< 切割日志的方式: 0 表示不切割; 1 表示按日期切割; 2 表示按大小切割
+	int   split_type;			///< 切割日志的方式: KY_LOG_SPLIT_NO 表示不切割; KY_LOG_SPLIT_DATE 表示按日期切割; KY_LOG_SPLIT_SIZE 表示按大小切割
 	int   day;					///< 记录今天是这个月的多少号
 	long  split_size;			///< 超过这个大小(字节)会切割日志
 #ifdef __linux
@@ -83,7 +91,7 @@ extern ky_log_t *g_ky_log_default;
  * @retval 非NULL		表示打开日志成功
  * @retval NULL			表示打开日志失败
  */
-extern ky_log_t *ky_log_open(const char *logFile, const char *openMode, ky_log_level_t level, int splitType, long splitSize);
+extern ky_log_t *ky_log_open(const char *logFile, const char *openMode, ky_log_level_t level, ky_log_split_t splitType, long splitSize);
 /**
  * @brief 关闭一个日志
  */
